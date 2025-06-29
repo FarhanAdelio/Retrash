@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Forum Diskusi - ReTrash{% endblock %}
+
+{% block content %}
+<div class="forum-header bg-success text-white py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Forum Diskusi</h1>
+                <p class="lead mb-4">Diskusikan berbagai topik seputar pengelolaan sampah dan lingkungan bersama komunitas ReTrash</p>
+                <a href="{% url 'forum:diskusi_baru' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Mulai Diskusi Baru
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Search Bar -->
+            <div class="search-bar mb-4">
+                <form method="get" class="d-flex gap-2">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0" 
+                               placeholder="Cari diskusi..." value="{{ request.GET.q }}">
+                    </div>
+                    <button type="submit" class="btn btn-success px-4">
+                        Cari
+                    </button>
+                </form>
+            </div>
+
+            <!-- Discussion List -->
+            {% for diskusi in object_list %}
+            <div class="card border-0 shadow-sm mb-4 discussion-card">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <img src="{{ diskusi.penulis.profile.avatar.url|default:'/static/images/default-avatar.png' }}" 
+                                 alt="{{ diskusi.penulis.username }}" 
+                                 class="rounded-circle discussion-avatar">
+                        </div>
+                        <div class="col">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0">
+                                    <a href="{% url 'forum:diskusi_detail' diskusi.slug %}" class="text-decoration-none text-dark stretched-link">
+                                        {{ diskusi.judul }}
+                                    </a>
+                                </h5>
+                                <span class="badge bg-success-subtle text-success rounded-pill">
+                                    <i class="far fa-comment me-1"></i>{{ diskusi.jumlah_komentar }}
+                                </span>
+                            </div>
+                            <p class="card-text text-muted mb-3">{{ diskusi.isi|truncatewords:30 }}</p>
+                            <div class="d-flex align-items-center text-muted small">
+                                <span class="fw-medium text-success">{{ diskusi.penulis.username }}</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ diskusi.created_at|timesince }} yang lalu</span>
+                                <span class="mx-2">•</span>
+                                <span><i class="far fa-eye me-1"></i>{{ diskusi.view_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <img src="{% static 'images/empty-discussion.svg' %}" alt="Tidak ada diskusi" class="mb-4" style="width: 200px;">
+                <h4 class="mb-3">Belum Ada Diskusi</h4>
+                <p class="text-muted mb-4">Jadilah yang pertama memulai diskusi di komunitas ini!</p>
+                <a href="{% url 'forum:diskusi_baru' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Mulai Diskusi Baru
+                </a>
+            </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.forum-header {
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
+    margin-top: -76px;
+    padding-top: calc(76px + 3rem) !important;
+}
+
+.search-bar .input-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.search-bar .form-control {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+}
+
+.search-bar .input-group-text {
+    padding-left: 1.25rem;
+    padding-right: 0;
+}
+
+.discussion-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+}
+
+.discussion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important;
+}
+
+.discussion-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.page-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    margin: 0 0.25rem;
+    border: none;
+    font-weight: 500;
+    color: #198754;
+}
+
+.page-item.active .page-link {
+    background-color: #198754;
+    color: white;
+}
+
+.page-link:hover {
+    background-color: #e9ecef;
+    color: #198754;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - ReTrash{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <article>
+                <div class="mb-4">
+                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-fluid rounded">
+                </div>
+                <h1 class="mb-4">{{ article.title }}</h1>
+                <div class="article-meta mb-4">
+                    <span class="badge bg-primary">{{ article.category.name }}</span>
+                    <span class="text-muted ms-3">
+                        <i class="fas fa-calendar"></i> {{ article.published_date|date:"d F Y" }}
+                        <i class="fas fa-user ms-3"></i> {{ article.author }}
+                    </span>
+                </div>
+                <div class="article-content">
+                    {{ article.content|safe }}
+                </div>
+            </article>
+
+            <!-- Artikel Terkait -->
+            <div class="mt-5">
+                <h3>Artikel Terkait</h3>
+                <div class="row">
+                    {% for related_article in related_articles %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{{ related_article.image.url }}" class="card-img-top" alt="{{ related_article.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ related_article.title }}</h5>
+                                <a href="{% url 'edukasi_detail' related_article.id %}" class="btn btn-outline-primary">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Kategori -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Kategori</h5>
+                    <div class="list-group">
+                        <a href="{% url 'edukasi' %}" class="list-group-item list-group-item-action">Semua</a>
+                        {% for category in categories %}
+                        <a href="{% url 'edukasi' %}?category={{ category.slug }}" class="list-group-item list-group-item-action">{{ category.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Artikel Populer -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Artikel Populer</h5>
+                    <div class="list-group">
+                        {% for popular_article in popular_articles %}
+                        <a href="{% url 'edukasi_detail' popular_article.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ popular_article.title }}</h6>
+                                <small class="text-muted">{{ popular_article.views }} views</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Cepat -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tips Cepat</h5>
+                    <div class="list-group">
+                        {% for tip in quick_tips %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ tip.title }}</h6>
+                            <p class="mb-1">{{ tip.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

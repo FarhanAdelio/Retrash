@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - ReTrash{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <article>
+                <h1 class="mb-4">{{ article.title }}</h1>
+                <div class="mb-4">
+                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-fluid rounded">
+                </div>
+                <div class="article-meta mb-4">
+                    <span class="text-muted">
+                        <i class="fas fa-calendar"></i> {{ article.published_date|date:"d F Y" }}
+                        <i class="fas fa-user ms-3"></i> {{ article.author }}
+                    </span>
+                </div>
+                <div class="article-content">
+                    {{ article.content|safe }}
+                </div>
+            </article>
+
+            <!-- Artikel Terkait -->
+            <div class="mt-5">
+                <h3>Artikel Terkait</h3>
+                <div class="row">
+                    {% for related_article in related_articles %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{{ related_article.image.url }}" class="card-img-top" alt="{{ related_article.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ related_article.title }}</h5>
+                                <a href="{% url 'article_detail' related_article.id %}" class="btn btn-outline-primary">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

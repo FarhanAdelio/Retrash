@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profil Saya - ReTrash{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,255,240,0.9) 100%);
+    }
+
+    .profile-header {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 150px;
+        background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+    }
+
+    .profile-info {
+        position: relative;
+        padding-top: 60px;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin: 0 auto 20px;
+        position: relative;
+        background: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-avatar .upload-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.6);
+        padding: 8px;
+        color: white;
+        font-size: 12px;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .profile-avatar:hover .upload-overlay {
+        opacity: 1;
+    }
+
+    .profile-name {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .profile-email {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .profile-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .content-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .form-floating {
+        margin-bottom: 20px;
+    }
+
+    .form-floating > .form-control {
+        padding: 1rem 1rem;
+        height: 60px;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+    }
+
+    .form-floating > .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25,135,84,0.25);
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-profile {
+        padding: 12px 30px;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-profile:hover {
+        transform: translateY(-2px);
+    }
+
+    .verification-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        background: #e1f7e3;
+        color: #198754;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-left: 10px;
+    }
+
+    .verification-badge i {
+        margin-right: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-stats {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            width: calc(50% - 15px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-cover"></div>
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+                    {% else %}
+                        <i class="fas fa-user fa-5x text-muted d-flex align-items-center justify-content-center h-100"></i>
+                    {% endif %}
+                    <div class="upload-overlay">
+                        <i class="fas fa-camera"></i> Ubah Foto
+                    </div>
+                </div>
+                <h1 class="profile-name">
+                    {{ user.get_full_name|default:user.username }}
+                    {% if user.is_verified %}
+                        <span class="verification-badge">
+                            <i class="fas fa-check-circle"></i> Terverifikasi
+                        </span>
+                    {% endif %}
+                </h1>
+                <p class="profile-email">{{ user.email }}</p>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Sampah</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Poin</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Transaksi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <div class="content-header">
+                <h2 class="content-title">Informasi Profil</h2>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Nama Depan" value="{{ user.first_name }}">
+                            <label for="first_name">Nama Depan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Nama Belakang" value="{{ user.last_name }}">
+                            <label for="last_name">Nama Belakang</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email }}">
+                    <label for="email">Email</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="Nomor Telepon" value="{{ user.phone_number }}">
+                    <label for="phone_number">Nomor Telepon</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" id="address" name="address" placeholder="Alamat" style="height: 100px">{{ user.profile.address }}</textarea>
+                    <label for="address">Alamat</label>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="city" name="city" placeholder="Kota" value="{{ user.profile.city }}">
+                            <label for="city">Kota</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Kode Pos" value="{{ user.profile.postal_code }}">
+                            <label for="postal_code">Kode Pos</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button type="submit" class="btn btn-success btn-profile">
+                        <i class="fas fa-save me-2"></i>Simpan Perubahan
+                    </button>
+                    <a href="/" class="btn btn-light btn-profile">
+                        <i class="fas fa-arrow-left me-2"></i>Kembali
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle profile picture upload
+    const avatarContainer = document.querySelector('.profile-avatar');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    avatarContainer.appendChild(fileInput);
+
+    avatarContainer.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = avatarContainer.querySelector('img') || document.createElement('img');
+                img.src = e.target.result;
+                if (!avatarContainer.querySelector('img')) {
+                    avatarContainer.querySelector('.fa-user')?.remove();
+                    avatarContainer.insertBefore(img, avatarContainer.firstChild);
+                }
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+});
+</script>
+{% endblock %} 

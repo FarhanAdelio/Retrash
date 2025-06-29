@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edukasi - ReTrash{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Edukasi</h1>
+                <p class="lead text-muted">Pelajari tentang pengelolaan sampah dan lingkungan hidup.</p>
+            </div>
+            <div class="col-lg-6">
+                <form action="{% url 'edukasi:search' %}" method="GET" class="d-flex gap-2">
+                    <input type="text" name="q" class="form-control" placeholder="Cari konten edukasi...">
+                    <button class="btn btn-success" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5">
+    <div class="container">
+        {% if edukasi_list %}
+        <div class="row g-4">
+            {% for content in edukasi_list %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm hover-card">
+                    {% if content.thumbnail %}
+                    <img src="{{ content.thumbnail.url }}" class="card-img-top" alt="{{ content.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="text-center py-5 bg-light">
+                        {% if content.content_type == 'article' %}
+                        <i class="fas fa-newspaper fa-4x text-muted"></i>
+                        {% elif content.content_type == 'guide' %}
+                        <i class="fas fa-book fa-4x text-muted"></i>
+                        {% elif content.content_type == 'video' %}
+                        <i class="fas fa-video fa-4x text-muted"></i>
+                        {% else %}
+                        <i class="fas fa-image fa-4x text-muted"></i>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <span class="badge bg-success mb-2">
+                            {% if content.content_type == 'article' %}
+                            <i class="fas fa-newspaper me-1"></i>Artikel
+                            {% elif content.content_type == 'guide' %}
+                            <i class="fas fa-book me-1"></i>Panduan
+                            {% elif content.content_type == 'video' %}
+                            <i class="fas fa-video me-1"></i>Video
+                            {% else %}
+                            <i class="fas fa-image me-1"></i>Infografis
+                            {% endif %}
+                        </span>
+                        
+                        <h5 class="card-title fw-bold mb-3">{{ content.title }}</h5>
+                        <p class="card-text text-muted mb-3">{{ content.content|truncatewords:20 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                {{ content.published_date|date:"d M Y" }}
+                            </small>
+                            <a href="{% url 'edukasi:detail' content.pk %}" class="btn btn-outline-success">
+                                {% if content.content_type == 'video' %}
+                                <i class="fas fa-play me-2"></i>Tonton
+                                {% else %}
+                                <i class="fas fa-book-open me-2"></i>Baca
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+            <h3>Belum ada konten edukasi</h3>
+            <p class="text-muted">Konten edukasi akan segera ditambahkan.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Custom CSS -->
+{% block extra_css %}
+<style>
+    .hover-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+    .page-link {
+        color: #198754;
+    }
+    .page-item.active .page-link {
+        background-color: #198754;
+        border-color: #198754;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

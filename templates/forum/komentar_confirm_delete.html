@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hapus Komentar - Forum ReTrash{% endblock %}
+
+{% block content %}
+<div class="forum-header bg-success text-white py-5 mb-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="{% url 'forum:list' %}" class="text-white text-decoration-none">Forum</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'forum:diskusi_detail' object.diskusi.slug %}" class="text-white text-decoration-none">{{ object.diskusi.judul }}</a></li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">Hapus Komentar</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-circle text-danger fa-3x"></i>
+                    </div>
+                    <h4 class="card-title mb-4">Konfirmasi Hapus</h4>
+                    <p class="text-muted mb-4">Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan.</p>
+                    
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <p class="card-text mb-0">{{ object.isi }}</p>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Hapus Komentar
+                            </button>
+                            <a href="{% url 'forum:diskusi_detail' object.diskusi.slug %}" class="btn btn-light">
+                                <i class="fas fa-times me-2"></i>Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.forum-header {
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
+    margin-top: -76px;
+    padding-top: calc(76px + 3rem) !important;
+}
+
+.btn {
+    border-radius: 0.75rem;
+    padding: 0.5rem 1.25rem;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.5);
+}
+</style>
+{% endblock %} 

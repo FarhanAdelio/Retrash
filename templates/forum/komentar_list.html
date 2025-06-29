@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Komentar - Forum ReTrash{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Komentar pada "{{ diskusi.judul }}"</h2>
+                <a href="{% url 'forum:diskusi_detail' diskusi.slug %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali ke Diskusi
+                </a>
+            </div>
+
+            {% if komentar_list %}
+                <div class="komentar-list">
+                    {% for komentar in komentar_list %}
+                        <div class="card mb-3 komentar-card" data-komentar-id="{{ komentar.id }}">
+                            <div class="card-body">
+                                <div class="d-flex mb-3">
+                                    <img src="{{ komentar.penulis.profile.avatar.url|default:'/static/images/default-avatar.png' }}"
+                                         alt="{{ komentar.penulis.username }}"
+                                         class="rounded-circle me-3"
+                                         width="40"
+                                         height="40">
+                                    <div>
+                                        <h6 class="mb-0">{{ komentar.penulis.get_full_name|default:komentar.penulis.username }}</h6>
+                                        <small class="text-muted">
+                                            {{ komentar.created_at|timesince }} yang lalu
+                                            {% if komentar.is_edited %}
+                                                · Diedit
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="komentar-content mb-3">
+                                    {{ komentar.isi|linebreaks }}
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        {% if komentar.penulis == request.user %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                    onclick="editKomentar({{ komentar.id }}, `{{ komentar.isi|escapejs }}`)"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editKomentarModal">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteKomentarModal{{ komentar.id }}">
+                                                <i class="fas fa-trash-alt me-1"></i>Hapus
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    <button class="btn btn-sm btn-link text-muted" onclick="balasKomentar('{{ komentar.penulis.username }}')">
+                                        <i class="fas fa-reply me-1"></i>Balas
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Hapus Komentar -->
+                        {% if komentar.penulis == request.user %}
+                            <div class="modal fade" id="deleteKomentarModal{{ komentar.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Konfirmasi Hapus</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Apakah Anda yakin ingin menghapus komentar ini?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <form action="{% url 'forum:hapus_komentar' komentar.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <img src="{% static 'images/empty-comments.svg' %}" alt="Tidak ada komentar" class="mb-3" style="width: 150px;">
+                    <h4>Belum ada komentar</h4>
+                    <p class="text-muted">Jadilah yang pertama memberikan komentar pada diskusi ini</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Komentar -->
+<div class="modal fade" id="editKomentarModal" tabindex="-1" aria-labelledby="editKomentarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header border-0 bg-success text-white">
+                <h5 class="modal-title" id="editKomentarModalLabel">Edit Komentar</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editKomentarForm" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" id="komentarId" name="komentar_id">
+                    <div class="mb-3">
+                        <label for="editKomentarContent" class="form-label">Isi Komentar</label>
+                        <textarea class="form-control" 
+                                id="editKomentarContent" 
+                                name="isi" 
+                                rows="5" 
+                                required></textarea>
+                        <div class="invalid-feedback">
+                            Mohon isi komentar Anda.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Batal
+                </button>
+                <button type="button" class="btn btn-success" onclick="submitEdit()">
+                    <i class="fas fa-save me-2"></i>Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.komentar-card {
+    transition: transform 0.2s;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.komentar-card:hover {
+    transform: translateY(-2px);
+}
+
+.komentar-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.page-link {
+    color: var(--bs-primary);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.2rem;
+    border-radius: 0.5rem;
+}
+
+.page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-group .btn {
+    border-radius: 0.5rem !important;
+    margin-right: 0.5rem;
+}
+
+.modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
+}
+
+.form-control {
+    border-radius: 0.75rem;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.btn {
+    border-radius: 0.75rem;
+    padding: 0.5rem 1.25rem;
+}
+
+.modal .btn-success {
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
+    border: none;
+    padding: 0.75rem 1.5rem;
+}
+
+.modal .btn-success:hover {
+    background: linear-gradient(135deg, #157347 0%, #229954 100%);
+}
+
+.was-validated .form-control:invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.loading-spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+.toast {
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+.toast.bg-success {
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%) !important;
+}
+
+.toast.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+}
+</style>
+
+<script>
+function editKomentar(id, content) {
+    document.getElementById('komentarId').value = id;
+    document.getElementById('editKomentarContent').value = content.replace(/<br\s*\/?>/g, '\n');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('successToast');
+    const toastBody = toast.querySelector('.toast-body');
+    
+    toast.classList.remove('bg-success', 'bg-danger');
+    toast.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
+    
+    toastBody.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+function submitEdit() {
+    const form = document.getElementById('editKomentarForm');
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+
+    const id = document.getElementById('komentarId').value;
+    const content = document.getElementById('editKomentarContent').value.trim();
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const submitBtn = document.querySelector('#editKomentarModal .btn-success');
+    const originalBtnHtml = submitBtn.innerHTML;
+
+    if (!content) {
+        showToast('Komentar tidak boleh kosong', 'error');
+        return;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menyimpan...`;
+
+    fetch(`/forum/komentar/${id}/edit/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ isi: content })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update komentar content in the DOM
+            const komentarElement = document.querySelector(`[data-komentar-id="${id}"] .komentar-content`);
+            komentarElement.innerHTML = data.content.replace(/\n/g, '<br>');
+            
+            // Add edited indicator if not exists
+            const timeElement = document.querySelector(`[data-komentar-id="${id}"] .text-muted`);
+            if (!timeElement.innerHTML.includes('· Diedit')) {
+                timeElement.innerHTML += ' · Diedit';
+            }
+
+            // Show success message
+            showToast(data.message);
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editKomentarModal'));
+            modal.hide();
+        } else {
+            showToast(data.message || 'Gagal menyimpan perubahan', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Terjadi kesalahan. Silakan coba lagi.', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+    });
+}
+
+function balasKomentar(username) {
+    const textarea = document.querySelector('textarea[name="isi"]');
+    if (textarea) {
+        textarea.value = `@${username} `;
+        textarea.focus();
+        textarea.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+</script>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>Komentar berhasil diperbarui</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %} 

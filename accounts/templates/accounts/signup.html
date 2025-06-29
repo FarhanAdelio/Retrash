@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daftar - ReTrash{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-section {
+        min-height: calc(100vh - 76px);
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,255,240,0.9) 100%);
+        padding: 60px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .auth-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .auth-image {
+        background: linear-gradient(135deg, rgba(25,135,84,0.9) 0%, rgba(20,108,67,0.9) 100%), url('{% static "images/gambar4.jpeg" %}');
+        background-size: cover;
+        background-position: center;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        min-height: 600px;
+    }
+
+    .auth-image-content {
+        position: relative;
+        z-index: 1;
+        color: white;
+        text-align: center;
+    }
+
+    .auth-image-content h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .auth-image-content p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .auth-form {
+        padding: 40px;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .auth-subtitle {
+        color: #636e72;
+        font-size: 1rem;
+    }
+
+    .form-floating {
+        margin-bottom: 20px;
+    }
+
+    .form-floating > .form-control {
+        padding: 1rem 1rem;
+        height: 60px;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+
+    .form-floating > label {
+        padding: 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25,135,84,0.25);
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        background: #198754;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .auth-btn:hover {
+        background: #146c43;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(20,108,67,0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .auth-footer p {
+        color: #636e72;
+        margin-bottom: 0;
+    }
+
+    .auth-footer a {
+        color: #198754;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: #146c43;
+    }
+
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .alert {
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: none;
+    }
+
+    .alert-danger {
+        background-color: #fff5f5;
+        color: #e53e3e;
+    }
+
+    @media (max-width: 991.98px) {
+        .auth-image {
+            min-height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="auth-card">
+                        <div class="row g-0">
+                            <div class="col-lg-6 d-none d-lg-block">
+                                <div class="auth-image">
+                                    <div class="auth-image-content">
+                                        <h2>Bergabung dengan ReTrash</h2>
+                                        <p>Mari bersama-sama menjaga lingkungan untuk masa depan yang lebih baik.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="auth-form">
+                                    <div class="auth-header">
+                                        <img src="{% static 'images/logo.jpeg' %}" alt="ReTrash Logo" class="auth-logo">
+                                        <h3 class="auth-title">Daftar Akun Baru</h3>
+                                        <p class="auth-subtitle">Mulai perjalanan peduli lingkungan Anda</p>
+                                    </div>
+
+                                    {% if messages %}
+                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                        {% for message in messages %}
+                                            {{ message }}
+                                        {% endfor %}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {% endif %}
+
+                                    <form method="post" action="{% url 'accounts:register' %}">
+                                        {% csrf_token %}
+                                        {% for field in form %}
+                                        <div class="form-floating mb-3">
+                                            {{ field }}
+                                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                            {% if field.help_text %}
+                                            <div class="form-text">{{ field.help_text }}</div>
+                                            {% endif %}
+                                            {% if field.errors %}
+                                            <div class="alert alert-danger mt-2">
+                                                {{ field.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+
+                                        <button type="submit" class="btn btn-success auth-btn">
+                                            <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
+                                        </button>
+                                    </form>
+
+                                    <div class="auth-footer">
+                                        <p>Sudah punya akun? <a href="/accounts/login/">Masuk</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

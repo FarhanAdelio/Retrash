@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ReTrash{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">{{ title }}</h1>
+                <p class="lead text-muted">Hubungi kami untuk informasi lebih lanjut atau kirimkan pesan Anda.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">Kirim Pesan</h4>
+                        
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.nama.id_for_label }}" class="form-label">Nama</label>
+                                {{ form.nama.errors }}
+                                <input type="text" class="form-control {% if form.nama.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.nama.id_for_label }}" 
+                                       name="{{ form.nama.html_name }}" 
+                                       required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email.errors }}
+                                <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.email.id_for_label }}" 
+                                       name="{{ form.email.html_name }}" 
+                                       required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.subjek.id_for_label }}" class="form-label">Subjek</label>
+                                {{ form.subjek.errors }}
+                                <input type="text" class="form-control {% if form.subjek.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.subjek.id_for_label }}" 
+                                       name="{{ form.subjek.html_name }}" 
+                                       required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.pesan.id_for_label }}" class="form-label">Pesan</label>
+                                {{ form.pesan.errors }}
+                                <textarea class="form-control {% if form.pesan.errors %}is-invalid{% endif %}" 
+                                          id="{{ form.pesan.id_for_label }}" 
+                                          name="{{ form.pesan.html_name }}" 
+                                          rows="5" 
+                                          required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Informasi Kontak</h4>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fas fa-map-marker-alt text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Alamat</h6>
+                                <p class="mb-0 text-muted">{{ alamat }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fas fa-phone text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Telepon</h6>
+                                <p class="mb-0">
+                                    <a href="tel:{{ telepon }}" class="text-muted text-decoration-none">{{ telepon }}</a>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fas fa-envelope text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Email</h6>
+                                <p class="mb-0">
+                                    <a href="mailto:{{ email }}" class="text-muted text-decoration-none">{{ email }}</a>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                    <i class="fas fa-clock text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Jam Kerja</h6>
+                                <p class="mb-0 text-muted">{{ jam_kerja }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Ikuti Kami</h4>
+                        <div class="d-flex gap-2">
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-info">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-danger">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-success">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% comment %} <!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="ratio ratio-21x9">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2904629窶ｦ" 
+                            allowfullscreen="" 
+                            loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> {% endcomment %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    }
+</style>
+{% endblock %}
+{% endblock %} 

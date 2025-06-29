@@ -1,0 +1,603 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Beranda - ReTrash{% endblock %}
+
+{% block extra_css %}
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Overlay -->
+<section class="hero-section position-relative">
+    <div class="hero-slider">
+        <div class="hero-slide active" style="background: url('{% static 'images/gambar1.jpeg' %}') no-repeat center center; background-size: cover;">
+            <div class="overlay"></div>
+            <div class="container h-100">
+                <div class="row h-100 align-items-center">
+                    <div class="col-lg-8" data-aos="fade-right">
+                        <div class="hero-content text-white">
+                            <h1 class="display-3 fw-bold mb-4">Tukarkan Sampah Anda</h1>
+                            <p class="lead mb-4">Dapatkan poin dan rewards menarik dari sampah yang Anda kumpulkan.</p>
+                            <div class="hero-buttons">
+                                <a href="/bank-sampah/" class="btn btn-success btn-lg me-3">
+                                    <i class="fas fa-recycle me-2"></i>Mulai Sekarang
+                                </a>
+                                <a href="#features" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-info-circle me-2"></i>Pelajari Lebih Lanjut
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-5 fw-bold">Layanan Kami</h2>
+            <p class="text-muted">Temukan berbagai fitur yang memudahkan Anda dalam mengelola sampah</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card text-center p-4 rounded-4 bg-white shadow-sm hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-circle bg-success-subtle">
+                            <i class="fas fa-recycle fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Bank Sampah</h4>
+                    <p class="text-muted mb-0">Temukan bank sampah terdekat dan tukarkan sampah Anda menjadi poin.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card text-center p-4 rounded-4 bg-white shadow-sm hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-circle bg-success-subtle">
+                            <i class="fas fa-graduation-cap fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Edukasi</h4>
+                    <p class="text-muted mb-0">Pelajari cara mengelola sampah dengan benar melalui artikel edukasi.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card text-center p-4 rounded-4 bg-white shadow-sm hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-circle bg-success-subtle">
+                            <i class="fas fa-chart-pie fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Statistik</h4>
+                    <p class="text-muted mb-0">Pantau perkembangan pengelolaan sampah di lingkungan Anda.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card text-center p-4 rounded-4 bg-white shadow-sm hover-lift">
+                    <div class="feature-icon mb-4">
+                        <div class="icon-circle bg-success-subtle">
+                            <i class="fas fa-gift fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Rewards</h4>
+                    <p class="text-muted mb-0">Dapatkan hadiah menarik dari poin yang Anda kumpulkan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Articles Section -->
+<section class="articles-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="text-success fw-semibold">ARTIKEL TERBARU</span>
+            <h2 class="display-5 fw-bold mt-2">Edukasi & Informasi</h2>
+        </div>
+        <div class="row g-4">
+            {% for artikel in artikel_terbaru %}
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="position-relative">
+                        <img src="{{ artikel.gambar.url }}" class="card-img-top" alt="{{ artikel.judul }}" style="height: 200px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-success rounded-pill">
+                                <i class="fas fa-bookmark me-1"></i>{{ artikel.kategori }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="far fa-calendar-alt text-success me-2"></i>
+                            <small class="text-muted">{{ artikel.tanggal_publikasi|date:"d M Y" }}</small>
+                        </div>
+                        <h5 class="card-title">{{ artikel.judul }}</h5>
+                        <p class="card-text text-muted">{{ artikel.konten|truncatewords:20 }}</p>
+                        <a href="/edukasi/{{ artikel.slug }}/" class="btn btn-outline-success">
+                            <i class="fas fa-arrow-right me-2"></i>Baca Selengkapnya
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bank Sampah Map Section -->
+<section class="map-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-success px-3 py-2 mb-2">LOKASI</span>
+            <h2 class="display-5 fw-bold mt-2">Bank Sampah Terdekat</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Temukan lokasi bank sampah terdekat dari posisi Anda dan dapatkan informasi detail tentang setiap lokasi</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- Map Column -->
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="map-container rounded-4 shadow-sm overflow-hidden h-100">
+                    <div id="map" style="height: 600px; width: 100%;"></div>
+                </div>
+            </div>
+            
+            {% comment %} <!-- Bank List Column -->
+            <div class="col-lg-5" data-aos="fade-left">
+                <div class="bank-list-container h-100 bg-white rounded-4 shadow-sm p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Daftar Bank Sampah</h5>
+                        <span class="badge bg-success rounded-pill">
+                            <i class="fas fa-location-dot me-1"></i>Terdekat
+                        </span>
+                    </div>
+                    
+                    <div class="bank-list" style="height: 520px; overflow-y: auto;">
+                        {% for bank in bank_terdekat %}
+                        <div class="card mb-3 border-0 shadow-hover">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    <img src="{{ bank.gambar.url }}" 
+                                         class="img-fluid rounded-start h-100" 
+                                         style="object-fit: cover;" 
+                                         alt="{{ bank.nama }}">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h6 class="card-title mb-1">{{ bank.nama }}</h6>
+                                            <span class="badge bg-success-subtle text-success rounded-pill">
+                                                <i class="fas fa-map-marker-alt me-1"></i>{{ bank.jarak }} km
+                                            </span>
+                                        </div>
+                                        <p class="card-text small text-muted mb-2">
+                                            <i class="fas fa-location-dot me-1"></i>{{ bank.alamat }}
+                                        </p>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a href="/bank-sampah/{{ bank.id }}/" 
+                                               class="btn btn-sm btn-success flex-grow-1">
+                                                <i class="fas fa-info-circle me-1"></i>Detail
+                                            </a>
+                                            <button onclick="showRoute({{ bank.latitude }}, {{ bank.longitude }})" 
+                                                    class="btn btn-sm btn-outline-success flex-grow-1">
+                                                <i class="fas fa-directions me-1"></i>Rute
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div> {% endcomment %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section py-5 bg-success">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+            <div class="col-lg-6 position-relative">
+                <div class="cta-image h-100" style="background: url('{% static 'images/gambar4.jpeg' %}') no-repeat center center; background-size: cover; min-height: 400px;">
+                    <div class="overlay position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.3);"></div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="cta-content p-4 p-lg-5 text-white">
+                    <span class="text-uppercase fw-semibold d-block mb-2" style="letter-spacing: 2px;">Gabung Sekarang</span>
+                    <h2 class="display-4 fw-bold mb-4">Bergabunglah dengan Kami</h2>
+                    <p class="lead mb-4">Mari bersama-sama menjaga lingkungan dengan mengelola sampah dengan benar.</p>
+                    <div class="cta-features mb-5">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-circle bg-white me-3" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-recycle text-success fa-lg"></i>
+                                    </div>
+                                    <h5 class="mb-0">Tukar Sampah</h5>
+                                </div>
+                                <p class="text-white-50">Tukarkan sampah Anda dengan poin yang dapat ditukarkan dengan hadiah menarik.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-circle bg-white me-3" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-hand-holding-heart text-success fa-lg"></i>
+                                    </div>
+                                    <h5 class="mb-0">Jaga Lingkungan</h5>
+                                </div>
+                                <p class="text-white-50">Berkontribusi dalam menjaga lingkungan untuk masa depan yang lebih baik.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cta-buttons d-flex flex-wrap gap-3">
+                        <a href="/accounts/register/" class="btn btn-light btn-lg px-5">
+                            <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-5">
+                            <i class="fas fa-info-circle me-2"></i>Pelajari Lebih Lanjut
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Custom CSS -->
+<style>
+/* Hero Section Styles */
+.hero-section {
+    height: 100vh;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-slide {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hero-slide .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    max-width: 800px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Features Section Styles */
+.features-section {
+    background-color: #f8f9fa;
+}
+
+.feature-icon {
+    margin-bottom: 1.5rem;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .icon-circle {
+    transform: scale(1.1);
+}
+
+/* Map Section Styles */
+.map-section {
+    background-color: #f8f9fa;
+}
+
+.map-container {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.map-container:hover {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.12);
+}
+
+.bank-list-container {
+    height: 600px;
+    transition: all 0.3s ease;
+}
+
+.bank-list-container:hover {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.12);
+}
+
+.shadow-hover {
+    transition: all 0.3s ease;
+}
+
+.shadow-hover:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.bank-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.bank-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.bank-list::-webkit-scrollbar-thumb {
+    background: #198754;
+    border-radius: 10px;
+}
+
+.gm-style-iw {
+    padding: 0 !important;
+}
+
+.gm-style-iw-d {
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+.gm-ui-hover-effect {
+    top: 0 !important;
+    right: 0 !important;
+}
+
+/* General Styles */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+
+@media (max-width: 991.98px) {
+    .hero-section {
+        height: 500px;
+    }
+    
+    .cta-image {
+        min-height: 300px !important;
+    }
+    
+    .bank-list-container {
+        height: 400px;
+        margin-top: 1rem;
+    }
+    
+    .bank-list {
+        height: 320px !important;
+    }
+    
+    #map {
+        height: 400px !important;
+    }
+}
+</style>
+
+<!-- AOS Animation Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+</script>
+
+<!-- Google Maps Script -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDc7PnOq3Hxzq6dxeUVaY8WGLHIePl0swY&callback=initMap"></script>
+<script>
+let map;
+let directionsService;
+let directionsRenderer;
+let currentInfoWindow = null;
+let markers = [];
+
+function initMap() {
+    // Inisialisasi peta dengan koordinat default Jakarta
+    const defaultLocation = { lat: -6.200000, lng: 106.816666 };
+    
+    // Buat instance peta baru
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: defaultLocation,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
+        styles: [
+            {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+            }
+        ]
+    });
+
+    // Inisialisasi directions service dan renderer
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: true
+    });
+
+    // Cek geolokasi pengguna
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // Tambah marker lokasi pengguna
+                const userMarker = new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    title: 'Lokasi Anda',
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                        scaledSize: new google.maps.Size(32, 32)
+                    },
+                    zIndex: 2
+                });
+
+                // Geser peta ke lokasi pengguna
+                map.setCenter(userLocation);
+
+                // Tambah markers untuk setiap bank sampah
+                {% for bank in bank_terdekat %}
+                const bankLocation = { 
+                    lat: {{ bank.latitude }}, 
+                    lng: {{ bank.longitude }} 
+                };
+
+                const marker = new google.maps.Marker({
+                    position: bankLocation,
+                    map: map,
+                    title: '{{ bank.nama }}',
+                    icon: {
+                        url: '{% static "images/marker.png" %}',
+                        scaledSize: new google.maps.Size(40, 40)
+                    },
+                    zIndex: 1
+                });
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: `
+                        <div class="p-3">
+                            <h6 class="mb-2">{{ bank.nama }}</h6>
+                            <p class="small mb-2">{{ bank.alamat }}</p>
+                            <button onclick="showRoute({{ bank.latitude }}, {{ bank.longitude }})" 
+                                    class="btn btn-sm btn-success">
+                                <i class="fas fa-directions me-1"></i>Lihat Rute
+                            </button>
+                        </div>
+                    `
+                });
+
+                marker.addListener('click', () => {
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
+                    }
+                    infowindow.open(map, marker);
+                    currentInfoWindow = infowindow;
+                });
+
+                markers.push(marker);
+                {% endfor %}
+
+                // Fit bounds untuk menampilkan semua marker
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(userLocation);
+                markers.forEach(marker => bounds.extend(marker.getPosition()));
+                map.fitBounds(bounds);
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                handleLocationError(true, map.getCenter());
+            }
+        );
+    } else {
+        handleLocationError(false, map.getCenter());
+    }
+}
+
+function handleLocationError(browserHasGeolocation, pos) {
+    const infoWindow = new google.maps.InfoWindow();
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(
+        browserHasGeolocation
+            ? "Error: Layanan geolokasi gagal."
+            : "Error: Browser Anda tidak mendukung geolokasi."
+    );
+    infoWindow.open(map);
+}
+
+function showRoute(destLat, destLng) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const origin = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                const destination = { lat: destLat, lng: destLng };
+
+                directionsService.route(
+                    {
+                        origin: origin,
+                        destination: destination,
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        optimizeWaypoints: true
+                    },
+                    (response, status) => {
+                        if (status === "OK") {
+                            if (currentInfoWindow) {
+                                currentInfoWindow.close();
+                            }
+                            directionsRenderer.setDirections(response);
+
+                            // Tampilkan informasi jarak dan waktu
+                            const route = response.routes[0];
+                            const leg = route.legs[0];
+                            const infoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div class="p-3">
+                                        <h6 class="mb-2">Informasi Rute</h6>
+                                        <p class="small mb-1">Jarak: ${leg.distance.text}</p>
+                                        <p class="small mb-0">Waktu: ${leg.duration.text}</p>
+                                    </div>
+                                `
+                            });
+                            infoWindow.setPosition(leg.end_location);
+                            infoWindow.open(map);
+                            currentInfoWindow = infoWindow;
+                        } else {
+                            window.alert("Gagal mendapatkan rute: " + status);
+                        }
+                    }
+                );
+            },
+            () => {
+                window.alert("Tidak dapat mengakses lokasi Anda.");
+            }
+        );
+    } else {
+        window.alert("Browser Anda tidak mendukung geolokasi.");
+    }
+}
+
+// Inisialisasi peta saat halaman dimuat
+window.initMap = initMap;
+</script>
+{% endblock %} 

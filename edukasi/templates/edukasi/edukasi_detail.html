@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ content.title }} - ReTrash{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'edukasi:list' %}" class="text-success">Edukasi</a></li>
+                <li class="breadcrumb-item active">{{ content.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Content Header -->
+                <div class="mb-4">
+                    <span class="badge bg-success mb-2">
+                        {% if content.content_type == 'article' %}
+                        <i class="fas fa-newspaper me-1"></i>Artikel
+                        {% elif content.content_type == 'guide' %}
+                        <i class="fas fa-book me-1"></i>Panduan
+                        {% elif content.content_type == 'video' %}
+                        <i class="fas fa-video me-1"></i>Video
+                        {% else %}
+                        <i class="fas fa-image me-1"></i>Infografis
+                        {% endif %}
+                    </span>
+                    <h1 class="fw-bold mb-3">{{ content.title }}</h1>
+                    <div class="d-flex align-items-center text-muted">
+                        <div class="me-3">
+                            <i class="far fa-calendar-alt me-1"></i>
+                            {{ content.published_date|date:"d M Y" }}
+                        </div>
+                        <div>
+                            <i class="far fa-clock me-1"></i>
+                            {{ content.published_date|time:"H:i" }} WIB
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                {% if content.thumbnail %}
+                <img src="{{ content.thumbnail.url }}" alt="{{ content.title }}" class="img-fluid rounded mb-4" style="width: 100%; max-height: 400px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Video Content -->
+                {% if content.content_type == 'video' and content.video_url %}
+                <div class="ratio ratio-16x9 mb-4">
+                    <iframe src="{{ content.video_url }}" allowfullscreen></iframe>
+                </div>
+                {% endif %}
+
+                <!-- Main Content -->
+                <div class="content-body">
+                    {{ content.content|safe }}
+                </div>
+
+                <!-- Share Buttons -->
+                <div class="mt-5">
+                    <h5 class="mb-3">Bagikan:</h5>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                           target="_blank" 
+                           class="btn btn-outline-primary">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ content.title }}" 
+                           target="_blank" 
+                           class="btn btn-outline-info">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ content.title }}%20{{ request.build_absolute_uri }}" 
+                           target="_blank" 
+                           class="btn btn-outline-success">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ content.title }}" 
+                           target="_blank" 
+                           class="btn btn-outline-primary">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Konten Terkait</h5>
+                        {% for related in related_content %}
+                        <div class="d-flex mb-3">
+                            {% if related.thumbnail %}
+                            <img src="{{ related.thumbnail.url }}" alt="{{ related.title }}" class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 60px;">
+                                <i class="fas fa-newspaper text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="ms-3">
+                                <h6 class="mb-1">
+                                    <a href="{% url 'edukasi:detail' related.pk %}" class="text-dark text-decoration-none hover-success">
+                                        {{ related.title|truncatechars:50 }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ related.published_date|date:"d M Y" }}
+                                </small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted mb-0">Belum ada konten terkait.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Custom CSS -->
+{% block extra_css %}
+<style>
+    .content-body {
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    .content-body img {
+        max-width: 100%;
+        height: auto;
+        margin: 1.5rem 0;
+    }
+    .content-body h2, 
+    .content-body h3, 
+    .content-body h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    .hover-success:hover {
+        color: var(--primary-color) !important;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

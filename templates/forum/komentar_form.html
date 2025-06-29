@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ object.id|yesno:"Edit,Tambah" }} Komentar - Forum ReTrash{% endblock %}
+
+{% block content %}
+<div class="forum-header bg-success text-white py-5 mb-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="{% url 'forum:list' %}" class="text-white text-decoration-none">Forum</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'forum:diskusi_detail' object.diskusi.slug %}" class="text-white text-decoration-none">{{ object.diskusi.judul }}</a></li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">{{ object.id|yesno:"Edit,Tambah" }} Komentar</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">{{ object.id|yesno:"Edit,Tambah" }} Komentar</h4>
+                    
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-4">
+                            <label for="{{ form.isi.id_for_label }}" class="form-label">Isi Komentar</label>
+                            <textarea class="form-control {% if form.isi.errors %}is-invalid{% endif %}"
+                                      id="{{ form.isi.id_for_label }}"
+                                      name="{{ form.isi.name }}"
+                                      rows="5"
+                                      required>{{ form.isi.value|default:'' }}</textarea>
+                            {% if form.isi.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.isi.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Simpan Komentar
+                            </button>
+                            <a href="{% url 'forum:diskusi_detail' object.diskusi.slug %}" class="btn btn-light">
+                                <i class="fas fa-times me-2"></i>Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.forum-header {
+    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
+    margin-top: -76px;
+    padding-top: calc(76px + 3rem) !important;
+}
+
+.form-control {
+    border-radius: 0.75rem;
+}
+
+.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.btn {
+    border-radius: 0.75rem;
+    padding: 0.5rem 1.25rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.5);
+}
+</style>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %} 

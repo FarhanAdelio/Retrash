@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kesalahan Server - ReTrash{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <img src="{% static 'images/500.png' %}" alt="500 Server Error" class="img-fluid mb-4" style="max-width: 300px;">
+            <h1 class="display-4 mb-4">Kesalahan Server</h1>
+            <p class="lead mb-4">Maaf, terjadi kesalahan pada server. Tim kami sedang berusaha memperbaiki masalah ini.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'home' %}" class="btn btn-primary">Kembali ke Beranda</a>
+                <a href="{% url 'contact' %}" class="btn btn-outline-primary">Hubungi Kami</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

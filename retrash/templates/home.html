@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Beranda - ReTrash{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">Selamat Datang di ReTrash</h1>
+                <p class="lead">Platform digital untuk pengelolaan sampah yang lebih baik dan berkelanjutan.</p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'bank_sampah:list' %}" class="btn btn-light btn-lg">Cari Bank Sampah</a>
+                    <a href="{% url 'edukasi:artikel_list' %}" class="btn btn-outline-light btn-lg">Pelajari Lebih Lanjut</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/hero-image.png' %}" alt="Hero Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Fitur ReTrash</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-recycle fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title">Bank Sampah</h3>
+                        <p class="card-text">Temukan bank sampah terdekat dan tukarkan sampah Anda menjadi poin.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title">Edukasi</h3>
+                        <p class="card-text">Pelajari cara mengelola sampah dengan benar melalui artikel edukasi.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title">Statistik</h3>
+                        <p class="card-text">Pantau perkembangan pengelolaan sampah di lingkungan Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Articles -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Artikel Terbaru</h2>
+        <div class="row g-4">
+            {% for artikel in artikel_terbaru %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ artikel.gambar.url }}" class="card-img-top" alt="{{ artikel.judul }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ artikel.judul }}</h5>
+                        <p class="card-text">{{ artikel.konten|truncatewords:20 }}</p>
+                        <a href="{% url 'edukasi:artikel_detail' artikel.slug %}" class="btn btn-primary">Baca Selengkapnya</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Waste Banks -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Bank Sampah Terdekat</h2>
+        <div class="row g-4">
+            {% for bank in bank_terdekat %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ bank.gambar.url }}" class="card-img-top" alt="{{ bank.nama }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ bank.nama }}</h5>
+                        <p class="card-text">{{ bank.deskripsi|truncatewords:20 }}</p>
+                        <a href="{% url 'bank_sampah:detail' bank.id %}" class="btn btn-primary">Lihat Detail</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Bergabunglah dengan Kami</h2>
+        <p class="lead mb-4">Mari bersama-sama menjaga lingkungan dengan mengelola sampah dengan benar.</p>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg">Daftar Sekarang</a>
+    </div>
+</section>
+{% endblock %} 
