@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verifikasi Pendaftaran Anggota{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <h2 class="mb-4"><i class="fas fa-user-check"></i> Verifikasi Pendaftaran Anggota</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                <i class="fas fa-clock"></i> Pending <span class="badge bg-warning text-dark">{{ pending.count }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
+                <i class="fas fa-check-circle"></i> Disetujui <span class="badge bg-success">{{ approved.count }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
+                <i class="fas fa-times-circle"></i> Ditolak <span class="badge bg-danger">{{ rejected.count }}</span>
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="myTabContent">
+        
+        <!-- Pending Tab -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Menunggu Verifikasi</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>NIK</th>
+                                        <th>Telepon</th>
+                                        <th>Tanggal Daftar</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in pending %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ p.nama_lengkap }}</td>
+                                        <td>{{ p.nik }}</td>
+                                        <td>{{ p.nomor_telepon }}</td>
+                                        <td>{{ p.tanggal_daftar|date:"d M Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'manajemen:admin_approve' p.pk %}" class="btn btn-sm btn-success" title="Setujui">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{% url 'manajemen:admin_reject' p.pk %}" class="btn btn-sm btn-danger" title="Tolak">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal{{ p.pk }}" title="Detail">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Detail Modal -->
+                                    <div class="modal fade" id="detailModal{{ p.pk }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Detail Pendaftaran - {{ p.nama_lengkap }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <table class="table table-bordered">
+                                                        <tr><th>NIK</th><td>{{ p.nik }}</td></tr>
+                                                        <tr><th>Email</th><td>{{ p.email }}</td></tr>
+                                                        <tr><th>Telepon</th><td>{{ p.nomor_telepon }}</td></tr>
+                                                        <tr><th>Alamat</th><td>{{ p.alamat_lengkap }}<br>RT/RW: {{ p.rt_rw }}, {{ p.kelurahan }}, {{ p.kecamatan }}, {{ p.kota }} {{ p.kode_pos }}</td></tr>
+                                                        {% if p.bank_sampah %}<tr><th>Bank Sampah</th><td>{{ p.bank_sampah.nama }}</td></tr>{% endif %}
+                                                        <tr><th>Estimasi Volume</th><td>{{ p.estimasi_volume }}</td></tr>
+                                                        {% if p.foto_ktp %}<tr><th>Foto KTP</th><td><img src="{{ p.foto_ktp.url }}" class="img-fluid" style="max-height: 300px;"></td></tr>{% endif %}
+                                                        {% if p.alasan_bergabung %}<tr><th>Alasan</th><td>{{ p.alasan_bergabung }}</td></tr>{% endif %}
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Tidak ada pendaftaran yang menunggu verifikasi.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Approved Tab -->
+        <div class="tab-pane fade" id="approved" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Pendaftaran Disetujui</h5>
+                </div>
+                <div class="card-body">
+                    {% if approved %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nomor Anggota</th>
+                                        <th>Nama</th>
+                                        <th>NIK</th>
+                                        <th>Tanggal Daftar</th>
+                                        <th>Tanggal Disetujui</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in approved %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><strong>{{ p.nomor_anggota }}</strong></td>
+                                        <td>{{ p.nama_lengkap }}</td>
+                                        <td>{{ p.nik }}</td>
+                                        <td>{{ p.tanggal_daftar|date:"d M Y" }}</td>
+                                        <td>{{ p.tanggal_disetujui|date:"d M Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Belum ada pendaftaran yang disetujui.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rejected Tab -->
+        <div class="tab-pane fade" id="rejected" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Pendaftaran Ditolak</h5>
+                </div>
+                <div class="card-body">
+                    {% if rejected %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>NIK</th>
+                                        <th>Tanggal Daftar</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in rejected %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ p.nama_lengkap }}</td>
+                                        <td>{{ p.nik }}</td>
+                                        <td>{{ p.tanggal_daftar|date:"d M Y" }}</td>
+                                        <td>{{ p.keterangan_admin|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Tidak ada pendaftaran yang ditolak.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

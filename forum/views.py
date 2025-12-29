@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Kategori, Diskusi, Komentar
-from django.db.models import F
+from django.db.models import F, Count, Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 class KategoriListView(ListView):
     model = Kategori
@@ -30,14 +32,34 @@ class DiskusiListView(ListView):
         queryset = super().get_queryset()
         q = self.request.GET.get('q')
         kategori_slug = self.request.GET.get('kategori')
+        sort_by = self.request.GET.get('sort', 'terbaru')
         
+        # Search functionality
         if q:
             queryset = queryset.filter(judul__icontains=q) | queryset.filter(isi__icontains=q)
         
+        # Category filter
         if kategori_slug:
             queryset = queryset.filter(kategori__slug=kategori_slug)
+        
+        # Sorting logic
+        if sort_by == 'populer':
+            # Sort by views (most viewed first)
+            queryset = queryset.order_by('-view_count', '-created_at')
+        elif sort_by == 'aktif':
+            # Sort by activity (comment count and recent updates)
+            queryset = queryset.annotate(
+                komentar_count=Count('komentar')
+            ).order_by('-komentar_count', '-updated_at')
+        else:  # terbaru (default)
+            queryset = queryset.order_by('-created_at')
             
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_sort'] = self.request.GET.get('sort', 'terbaru')
+        return context
 
     def get_kategori(self):
         return Kategori.objects.all()
@@ -72,11 +94,14 @@ class DiskusiDetailView(DetailView):
         context['komentar_list'] = self.object.komentar.all().order_by('created_at')
         return context
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        self.object.view_count = F('view_count') + 1
-        self.object.save()
-        return response
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Increment view count
+        obj.view_count += 1
+        obj.save(update_fields=['view_count'])
+        # Refresh from DB to get the actual value
+        obj.refresh_from_db()
+        return obj
 
 class DiskusiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Diskusi
@@ -90,6 +115,19 @@ class DiskusiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Diskusi berhasil diperbarui!')
         return super().form_valid(form)
+
+class DiskusiDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Diskusi
+    template_name = 'forum/diskusi_confirm_delete.html'
+    success_url = reverse_lazy('forum:list')
+
+    def test_func(self):
+        diskusi = self.get_object()
+        return self.request.user == diskusi.penulis
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Diskusi berhasil dihapus!')
+        return super().delete(request, *args, **kwargs)
 
 class KomentarCreateView(LoginRequiredMixin, CreateView):
     model = Komentar

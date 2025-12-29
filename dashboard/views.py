@@ -1,38 +1,105 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from manajemen.models import Transaksi
+from manajemen.models import Transaksi, PendaftaranAnggota, BankSampah, Artikel
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create your views here.
 
 @login_required
 def dashboard(request):
-    # Hitung total transaksi
+    """Dashboard dengan tampilan berbeda untuk user dan admin"""
+    
+    # Jika user adalah admin/staff
+    if request.user.is_staff or request.user.is_superuser:
+        return admin_dashboard(request)
+    
+    # Jika user biasa
+    return user_dashboard(request)
+
+
+def user_dashboard(request):
+    """Dashboard untuk user biasa"""
+    
+    # Cek status pendaftaran
+    try:
+        pendaftaran = PendaftaranAnggota.objects.get(user=request.user)
+        status_anggota = pendaftaran.status
+        nomor_anggota = pendaftaran.nomor_anggota
+    except PendaftaranAnggota.DoesNotExist:
+        pendaftaran = None
+        status_anggota = None
+        nomor_anggota = None
+    
+    # Data transaksi user
     total_transaksi = Transaksi.objects.filter(user=request.user).count()
+    transaksi_diproses = Transaksi.objects.filter(user=request.user, status='diproses').count()
     
-    # Hitung transaksi yang sedang diproses
-    transaksi_diproses = Transaksi.objects.filter(
-        user=request.user,
-        status='diproses'
-    ).count()
-    
-    # Hitung total poin
+    # Total poin/saldo
     total_poin = sum(
         transaksi.total_harga for transaksi in 
         Transaksi.objects.filter(user=request.user, status='selesai')
     )
     
-    # Ambil 5 transaksi terakhir
+    # Transaksi terakhir
     transaksi_terakhir = Transaksi.objects.filter(
         user=request.user
     ).order_by('-tanggal_transaksi')[:5]
     
     context = {
+        'is_admin': False,
+        'pendaftaran': pendaftaran,
+        'status_anggota': status_anggota,
+        'nomor_anggota': nomor_anggota,
         'total_transaksi': total_transaksi,
         'transaksi_diproses': transaksi_diproses,
         'total_poin': total_poin,
         'transaksi_terakhir': transaksi_terakhir,
     }
-    return render(request, 'dashboard/dashboard.html', context)
+    
+    return render(request, 'dashboard/user_dashboard.html', context)
+
+
+def admin_dashboard(request):
+    """Dashboard untuk admin"""
+    from forum.models import Diskusi
+    
+    # Statistik umum
+    total_users = User.objects.count()
+    total_bank_sampah = BankSampah.objects.count()
+    total_artikel = Artikel.objects.count()
+    
+    # Pendaftaran anggota
+    pendaftaran_pending = PendaftaranAnggota.objects.filter(status='pending').count()
+    pendaftaran_approved = PendaftaranAnggota.objects.filter(status='approved').count()
+    
+    # Transaksi
+    total_transaksi = Transaksi.objects.count()
+    transaksi_pending = Transaksi.objects.filter(status='pending').count()
+    transaksi_diproses = Transaksi.objects.filter(status='diproses').count()
+    
+    # Aktivitas terbaru
+    recent_users = User.objects.order_by('-date_joined')[:5]
+    recent_pendaftaran = PendaftaranAnggota.objects.order_by('-tanggal_daftar')[:5]
+    recent_transaksi = Transaksi.objects.order_by('-tanggal_transaksi')[:5]
+    
+    context = {
+        'is_admin': True,
+        'total_users': total_users,
+        'total_bank_sampah': total_bank_sampah,
+        'total_artikel': total_artikel,
+        'pendaftaran_pending': pendaftaran_pending,
+        'pendaftaran_approved': pendaftaran_approved,
+        'total_transaksi': total_transaksi,
+        'transaksi_pending': transaksi_pending,
+        'transaksi_diproses': transaksi_diproses,
+        'recent_users': recent_users,
+        'recent_pendaftaran': recent_pendaftaran,
+        'recent_transaksi': recent_transaksi,
+    }
+    
+    return render(request, 'dashboard/admin_dashboard.html', context)
 
 @login_required
 def profile(request):

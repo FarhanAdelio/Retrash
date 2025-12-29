@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ bank.nama }} - ReTrash{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Bank Info Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                {% if bank.gambar %}
+                <div class="position-relative overflow-hidden" style="height: 400px;">
+                    <img src="{{ bank.gambar.url }}" alt="{{ bank.nama }}" class="w-100 h-100" style="object-fit: cover;">
+                </div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <h1 class="fw-bold text-success mb-4">{{ bank.nama }}</h1>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-map-marker-alt text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Alamat:</strong>
+                                    <p class="text-muted mb-0">{{ bank.alamat }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-phone text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Telepon:</strong>
+                                    <p class="text-muted mb-0">{{ bank.telepon }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-envelope text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Email:</strong>
+                                    <p class="text-muted mb-0">{{ bank.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-clock text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Jam Operasional:</strong>
+                                    <p class="text-muted mb-0">{{ bank.jam_operasional }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="fw-bold mb-3">Deskripsi</h3>
+                    <p class="text-muted">{{ bank.deskripsi }}</p>
+                </div>
+            </div>
+
+            <!-- Lokasi -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-3">
+                        <i class="fas fa-map text-success me-2"></i>Lokasi
+                    </h3>
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe 
+                            src="https://maps.google.com/maps?q={{ bank.latitude }},{{ bank.longitude }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ bank.latitude }},{{ bank.longitude }}" 
+                       target="_blank" 
+                       class="btn btn-outline-success w-100">
+                        <i class="fas fa-directions me-2"></i>Petunjuk Arah
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Informasi Tambahan -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-3">
+                        <i class="fas fa-recycle text-success me-2"></i>Jenis Sampah yang Diterima
+                    </h3>
+                    {% if bank.jenis_sampah.all %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for jenis in bank.jenis_sampah.all %}
+                        <span class="badge bg-success-subtle text-success px-3 py-2">
+                            <i class="fas fa-check-circle me-1"></i>{{ jenis.nama }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Belum ada informasi jenis sampah</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Harga -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-3">
+                        <i class="fas fa-money-bill-wave text-success me-2"></i>Harga per kg
+                    </h3>
+                    {% if bank.jenis_sampah.all %}
+                    <ul class="list-unstyled">
+                        {% for jenis in bank.jenis_sampah.all %}
+                        <li class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <span class="text-muted">{{ jenis.nama }}</span>
+                            <span class="fw-bold text-success">Rp {{ jenis.harga_per_kg|floatformat:0 }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">Belum ada informasi harga</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Kontak -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-3">
+                        <i class="fas fa-paper-plane text-success me-2"></i>Hubungi Kami
+                    </h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Pesan</label>
+                            <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+</style>
+{% endblock %} 

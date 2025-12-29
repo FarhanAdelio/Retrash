@@ -35,6 +35,7 @@ urlpatterns = [
     path('manajemen/', include('manajemen.urls')),
     path('penjadwalan/', include('penjadwalan.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('tracking/', include('tracking.urls')),
     path('accounts/register/', SignUpView.as_view(), name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),

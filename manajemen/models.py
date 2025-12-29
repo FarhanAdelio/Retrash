@@ -111,3 +111,58 @@ class Transaksi(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.bank_sampah.nama} - {self.tanggal_transaksi}"
+
+
+class PendaftaranAnggota(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Menunggu Verifikasi'),
+        ('approved', 'Disetujui'),
+        ('rejected', 'Ditolak'),
+    ]
+    
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pendaftaran')
+    
+    # Data Pribadi
+    nama_lengkap = models.CharField(max_length=200, verbose_name='Nama Lengkap')
+    nik = models.CharField(max_length=16, unique=True, verbose_name='NIK')
+    nomor_telepon = models.CharField(max_length=15, verbose_name='Nomor Telepon/WhatsApp')
+    email = models.EmailField(verbose_name='Email')
+    
+    # Data Alamat
+    alamat_lengkap = models.TextField(verbose_name='Alamat Lengkap')
+    rt_rw = models.CharField(max_length=10, verbose_name='RT/RW')
+    kelurahan = models.CharField(max_length=100, verbose_name='Kelurahan/Desa')
+    kecamatan = models.CharField(max_length=100, verbose_name='Kecamatan')
+    kota = models.CharField(max_length=100, verbose_name='Kota/Kabupaten')
+    kode_pos = models.CharField(max_length=6, verbose_name='Kode Pos')
+    
+    # Data Tambahan
+    bank_sampah = models.ForeignKey(BankSampah, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Bank Sampah Terdekat')
+    jenis_sampah_disetor = models.ManyToManyField(JenisSampah, blank=True, verbose_name='Jenis Sampah yang Disetor')
+    estimasi_volume = models.CharField(max_length=50, help_text='Estimasi volume sampah per bulan (kg)', verbose_name='Estimasi Volume')
+    foto_ktp = models.ImageField(upload_to='ktp_anggota/', null=True, blank=True, verbose_name='Foto KTP')
+    alasan_bergabung = models.TextField(blank=True, verbose_name='Alasan Bergabung')
+    
+    # Status dan Tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name='Status')
+    tanggal_daftar = models.DateTimeField(auto_now_add=True, verbose_name='Tanggal Pendaftaran')
+    tanggal_disetujui = models.DateTimeField(null=True, blank=True, verbose_name='Tanggal Disetujui')
+    keterangan_admin = models.TextField(blank=True, help_text='Catatan dari admin', verbose_name='Keterangan Admin')
+    
+    # Nomor Anggota (auto-generated setelah approved)
+    nomor_anggota = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name='Nomor Anggota')
+    
+    class Meta:
+        verbose_name = 'Pendaftaran Anggota'
+        verbose_name_plural = 'Pendaftaran Anggota'
+        ordering = ['-tanggal_daftar']
+    
+    def __str__(self):
+        return f"{self.nama_lengkap} - {self.get_status_display()}"
+    
+    def generate_nomor_anggota(self):
+        """Generate nomor anggota unik"""
+        from datetime import datetime
+        year = datetime.now().year
+        count = PendaftaranAnggota.objects.filter(status='approved').count() + 1
+        return f"BS{year}{count:05d}"

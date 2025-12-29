@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Status Pendaftaran{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-clipboard-check"></i> Status Pendaftaran Anggota</h4>
+                </div>
+                <div class="card-body">
+                    
+                    {% if pendaftaran.status == 'pending' %}
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-clock"></i> Menunggu Verifikasi</h5>
+                            <p class="mb-0">Pendaftaran Anda sedang dalam proses verifikasi oleh admin. Mohon menunggu maksimal 3x24 jam.</p>
+                        </div>
+                    {% elif pendaftaran.status == 'approved' %}
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> Pendaftaran Disetujui!</h5>
+                            <p class="mb-0">Selamat! Anda telah resmi menjadi anggota bank sampah.</p>
+                        </div>
+                        
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Nomor Anggota Anda</h5>
+                                <h2 class="text-success">{{ pendaftaran.nomor_anggota }}</h2>
+                                <p class="text-muted mb-0">Simpan nomor anggota ini untuk transaksi di bank sampah</p>
+                            </div>
+                        </div>
+                    {% elif pendaftaran.status == 'rejected' %}
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-times-circle"></i> Pendaftaran Ditolak</h5>
+                            <p class="mb-0">Maaf, pendaftaran Anda ditolak oleh admin.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Detail Pendaftaran -->
+                    <h5 class="mt-4 mb-3">Detail Pendaftaran</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Nama Lengkap</th>
+                            <td>{{ pendaftaran.nama_lengkap }}</td>
+                        </tr>
+                        <tr>
+                            <th>NIK</th>
+                            <td>{{ pendaftaran.nik }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nomor Telepon</th>
+                            <td>{{ pendaftaran.nomor_telepon }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ pendaftaran.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Alamat</th>
+                            <td>{{ pendaftaran.alamat_lengkap }}<br>
+                                RT/RW: {{ pendaftaran.rt_rw }}, {{ pendaftaran.kelurahan }}, {{ pendaftaran.kecamatan }}<br>
+                                {{ pendaftaran.kota }}, {{ pendaftaran.kode_pos }}
+                            </td>
+                        </tr>
+                        {% if pendaftaran.bank_sampah %}
+                        <tr>
+                            <th>Bank Sampah</th>
+                            <td>{{ pendaftaran.bank_sampah.nama }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Tanggal Pendaftaran</th>
+                            <td>{{ pendaftaran.tanggal_daftar|date:"d F Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                {% if pendaftaran.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">{{ pendaftaran.get_status_display }}</span>
+                                {% elif pendaftaran.status == 'approved' %}
+                                    <span class="badge bg-success">{{ pendaftaran.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ pendaftaran.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if pendaftaran.tanggal_disetujui %}
+                        <tr>
+                            <th>Tanggal Disetujui</th>
+                            <td>{{ pendaftaran.tanggal_disetujui|date:"d F Y H:i" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if pendaftaran.keterangan_admin %}
+                        <tr>
+                            <th>Keterangan Admin</th>
+                            <td>{{ pendaftaran.keterangan_admin }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Kembali ke Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

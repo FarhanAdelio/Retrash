@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'kontak',
     'statistik',
     'forum',
+    'tracking',
 ]
 
 MIDDLEWARE = [

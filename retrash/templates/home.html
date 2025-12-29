@@ -59,27 +59,6 @@
     </div>
 </section>
 
-<!-- Latest Articles -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-5">Artikel Terbaru</h2>
-        <div class="row g-4">
-            {% for artikel in artikel_terbaru %}
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <img src="{{ artikel.gambar.url }}" class="card-img-top" alt="{{ artikel.judul }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ artikel.judul }}</h5>
-                        <p class="card-text">{{ artikel.konten|truncatewords:20 }}</p>
-                        <a href="{% url 'edukasi:artikel_detail' artikel.slug %}" class="btn btn-primary">Baca Selengkapnya</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
 <!-- Waste Banks -->
 <section class="py-5">
     <div class="container">

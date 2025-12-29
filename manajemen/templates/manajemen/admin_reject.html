@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tolak Pendaftaran{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-times-circle"></i> Tolak Pendaftaran</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">Detail Pendaftar</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="40%">Nama</th>
+                            <td>{{ pendaftaran.nama_lengkap }}</td>
+                        </tr>
+                        <tr>
+                            <th>NIK</th>
+                            <td>{{ pendaftaran.nik }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ pendaftaran.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telepon</th>
+                            <td>{{ pendaftaran.nomor_telepon }}</td>
+                        </tr>
+                    </table>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
+                            <textarea name="keterangan" class="form-control" rows="3" placeholder="Jelaskan alasan penolakan..." required></textarea>
+                            <small class="form-text text-muted">Alasan ini akan dilihat oleh pendaftar</small>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Dengan menolak pendaftaran ini, pendaftar dapat mendaftar ulang di kemudian hari.
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-times"></i> Ya, Tolak Pendaftaran
+                            </button>
+                            <a href="{% url 'manajemen:admin_verifikasi' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

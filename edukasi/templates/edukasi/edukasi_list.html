@@ -4,146 +4,185 @@
 {% block title %}Edukasi - ReTrash{% endblock %}
 
 {% block content %}
-<!-- Header Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">Edukasi</h1>
-                <p class="lead text-muted">Pelajari tentang pengelolaan sampah dan lingkungan hidup.</p>
+<div class="container mt-5 mb-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="mb-4" data-aos="fade-down">
+                <i class="fas fa-graduation-cap text-success" style="font-size: 4rem;"></i>
             </div>
-            <div class="col-lg-6">
-                <form action="{% url 'edukasi:search' %}" method="GET" class="d-flex gap-2">
-                    <input type="text" name="q" class="form-control" placeholder="Cari konten edukasi...">
-                    <button class="btn btn-success" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+            <h1 class="display-4 fw-bold text-success mb-3" data-aos="fade-up">
+                Edukasi Pengelolaan Sampah
+            </h1>
+            <p class="lead text-muted mb-4" data-aos="fade-up" data-aos-delay="100">
+                Pelajari cara mengelola sampah dengan benar untuk lingkungan yang lebih baik
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="200">
+                <a href="{% url 'edukasi:external_news' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-newspaper me-2"></i>Berita Lingkungan Terkini
+                </a>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Content Section -->
-<section class="py-5">
-    <div class="container">
-        {% if edukasi_list %}
-        <div class="row g-4">
-            {% for content in edukasi_list %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm hover-card">
-                    {% if content.thumbnail %}
-                    <img src="{{ content.thumbnail.url }}" class="card-img-top" alt="{{ content.title }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                    <div class="text-center py-5 bg-light">
-                        {% if content.content_type == 'article' %}
-                        <i class="fas fa-newspaper fa-4x text-muted"></i>
-                        {% elif content.content_type == 'guide' %}
-                        <i class="fas fa-book fa-4x text-muted"></i>
-                        {% elif content.content_type == 'video' %}
-                        <i class="fas fa-video fa-4x text-muted"></i>
-                        {% else %}
-                        <i class="fas fa-image fa-4x text-muted"></i>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    
-                    <div class="card-body">
-                        <span class="badge bg-success mb-2">
-                            {% if content.content_type == 'article' %}
-                            <i class="fas fa-newspaper me-1"></i>Artikel
-                            {% elif content.content_type == 'guide' %}
-                            <i class="fas fa-book me-1"></i>Panduan
-                            {% elif content.content_type == 'video' %}
-                            <i class="fas fa-video me-1"></i>Video
-                            {% else %}
-                            <i class="fas fa-image me-1"></i>Infografis
-                            {% endif %}
+    <!-- Artikel Edukasi Internal -->
+    {% if edukasi_list %}
+    <div class="row mb-5">
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="fw-bold">
+                    <i class="fas fa-book-open text-success me-2"></i>Artikel Edukasi
+                </h2>
+                <span class="badge bg-success fs-6">{{ edukasi_list|length }} Artikel</span>
+            </div>
+            <hr class="border-success border-2">
+        </div>
+        
+        {% for content in edukasi_list %}
+        <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                {% if content.image %}
+                <div class="position-relative overflow-hidden" style="height: 220px;">
+                    <img src="{{ content.image.url }}" class="card-img-top h-100 w-100" style="object-fit: cover;" alt="{{ content.title }}">
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <span class="badge bg-success shadow">
+                            <i class="fas fa-leaf me-1"></i>Edukasi
                         </span>
-                        
-                        <h5 class="card-title fw-bold mb-3">{{ content.title }}</h5>
-                        <p class="card-text text-muted mb-3">{{ content.content|truncatewords:20 }}</p>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="far fa-calendar-alt me-1"></i>
-                                {{ content.published_date|date:"d M Y" }}
-                            </small>
-                            <a href="{% url 'edukasi:detail' content.pk %}" class="btn btn-outline-success">
-                                {% if content.content_type == 'video' %}
-                                <i class="fas fa-play me-2"></i>Tonton
-                                {% else %}
-                                <i class="fas fa-book-open me-2"></i>Baca
-                                {% endif %}
-                            </a>
-                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="position-relative overflow-hidden bg-gradient-success d-flex align-items-center justify-content-center" style="height: 220px;">
+                    <i class="fas fa-book-reader fa-4x text-white opacity-50"></i>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold mb-3">{{ content.title }}</h5>
+                    <p class="card-text text-muted small flex-grow-1">
+                        {{ content.content|truncatewords:20|safe }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="far fa-calendar me-1"></i>{{ content.published_date|date:"d M Y" }}
+                        </small>
+                        <a href="{% url 'edukasi:detail' content.slug %}" class="btn btn-sm btn-outline-success">
+                            Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
-
-        <!-- Pagination -->
-        {% if is_paginated %}
-        <nav class="mt-5">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                </li>
-                {% endif %}
-
-                {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                </li>
-                {% else %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
-                {% endif %}
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
-        
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
-            <h3>Belum ada konten edukasi</h3>
-            <p class="text-muted">Konten edukasi akan segera ditambahkan.</p>
-        </div>
-        {% endif %}
+        {% endfor %}
     </div>
-</section>
+    {% else %}
+    <!-- Empty State - Elegant Design -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4" data-aos="zoom-in">
+                        <i class="fas fa-book-reader text-success" style="font-size: 5rem; opacity: 0.7;"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-3" data-aos="fade-up">Konten Edukasi Segera Hadir</h3>
+                    <p class="text-muted mb-4 lead" data-aos="fade-up" data-aos-delay="100">
+                        Kami sedang menyiapkan konten edukasi berkualitas untuk Anda.<br>
+                        Sementara itu, Anda dapat membaca berita lingkungan terkini.
+                    </p>
+                    <a href="{% url 'edukasi:external_news' %}" class="btn btn-success btn-lg shadow" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-newspaper me-2"></i>Baca Berita Lingkungan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Custom CSS -->
-{% block extra_css %}
+    <!-- Info Cards -->
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card h-100 border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-recycle text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Reduce, Reuse, Recycle</h5>
+                    <p class="text-muted small">Prinsip dasar pengelolaan sampah yang efektif dan ramah lingkungan</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="card h-100 border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-leaf text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Lingkungan Bersih</h5>
+                    <p class="text-muted small">Bersama menciptakan lingkungan yang sehat dan berkelanjutan</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="card h-100 border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-users text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">Komunitas Peduli</h5>
+                    <p class="text-muted small">Bergabung dengan komunitas yang peduli terhadap pengelolaan sampah</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
 <style>
-    .hover-card {
-        transition: transform 0.2s ease-in-out;
-    }
-    .hover-card:hover {
-        transform: translateY(-5px);
-    }
-    .page-link {
-        color: #198754;
-    }
-    .page-item.active .page-link {
-        background-color: #198754;
-        border-color: #198754;
-    }
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+.hover-lift img {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover img {
+    transform: scale(1.1);
+}
 </style>
-{% endblock %}
 {% endblock %} 

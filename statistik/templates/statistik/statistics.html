@@ -1,0 +1,479 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Statistik Sampah - ReTrash{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+    
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stats-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    
+    .stats-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .chart-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .chart-card .card-body {
+        padding: 2rem;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .filter-btn {
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .table-modern {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .table-modern thead {
+        background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+        color: white;
+    }
+    
+    .table-modern tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    
+    .table-modern tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .badge-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .export-btn {
+        border-radius: 25px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Statistik & Analisis Sampah
+                </h1>
+                <p class="mb-0 opacity-75">Dashboard analitik untuk monitoring pengelolaan sampah</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light export-btn" onclick="exportData()">
+                    <i class="fas fa-download me-2"></i>Export Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <form method="get" id="filterForm" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-filter me-2"></i>Tipe Filter
+                </label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="filter" id="filter_all" value="all" 
+                           {% if current_filter == 'all' %}checked{% endif %}>
+                    <label class="btn btn-outline-primary filter-btn" for="filter_all">Semua</label>
+                    
+                    <input type="radio" class="btn-check" name="filter" id="filter_yearly" value="yearly"
+                           {% if current_filter == 'yearly' or not current_filter %}checked{% endif %}>
+                    <label class="btn btn-outline-primary filter-btn" for="filter_yearly">Tahunan</label>
+                    
+                    <input type="radio" class="btn-check" name="filter" id="filter_monthly" value="monthly"
+                           {% if current_filter == 'monthly' %}checked{% endif %}>
+                    <label class="btn btn-outline-primary filter-btn" for="filter_monthly">Bulanan</label>
+                </div>
+            </div>
+            
+            <div class="col-md-3" id="yearFilter">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-calendar me-2"></i>Tahun
+                </label>
+                <select name="year" class="form-select" id="yearSelect">
+                    {% for year in available_years %}
+                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>
+                        {{ year }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3" id="monthFilter" style="display: {% if current_filter == 'monthly' %}block{% else %}none{% endif %};">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-calendar-day me-2"></i>Bulan
+                </label>
+                <select name="month" class="form-select" id="monthSelect">
+                    {% for month in months %}
+                    <option value="{{ month.value }}" {% if month.value == current_month %}selected{% endif %}>
+                        {{ month.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 filter-btn">
+                    <i class="fas fa-search me-2"></i>Tampilkan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card text-white" style="background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
+                <div class="card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="stats-label">Total Sampah</div>
+                    <div class="stats-value">{{ total_sampah|floatformat:1 }} kg</div>
+                    <small>{{ total_transaksi }} transaksi</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stats-card text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                <div class="card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stats-label">Total Pendapatan</div>
+                    <div class="stats-value">Rp {{ total_pendapatan|floatformat:0 }}</div>
+                    <small>Rata-rata: {{ rata_berat|floatformat:1 }} kg/transaksi</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stats-card text-white" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                <div class="card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="stats-label">Poin Terkumpul</div>
+                    <div class="stats-value">{{ total_points }}</div>
+                    <small>20 poin per kg</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stats-card text-white" style="background: linear-gradient(135deg, #20c997 0%, #17a085 100%);">
+                <div class="card-body">
+                    <div class="stats-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stats-label">Pengurangan CO2</div>
+                    <div class="stats-value">{{ co2_reduction|floatformat:1 }} kg</div>
+                    <small>Dampak lingkungan</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-3">
+            <div class="chart-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-area me-2 text-primary"></i>
+                        Trend Pengumpulan Sampah
+                    </h5>
+                    <canvas id="wasteTrendChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-3">
+            <div class="chart-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-pie me-2 text-success"></i>
+                        Distribusi Jenis Sampah
+                    </h5>
+                    <canvas id="wasteTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if is_admin and bank_ranking %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="chart-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        Ranking Bank Sampah
+                    </h5>
+                    <canvas id="bankRankingChart" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card chart-card">
+        <div class="card-body">
+            <h5 class="card-title mb-4">
+                <i class="fas fa-history me-2 text-info"></i>
+                Riwayat Transaksi Terbaru
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-modern">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            {% if is_admin %}
+                            <th>User</th>
+                            {% endif %}
+                            <th>Jenis Sampah</th>
+                            <th>Berat (kg)</th>
+                            <th>Total Harga</th>
+                            <th>Bank Sampah</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaksi in recent_transactions %}
+                        <tr>
+                            <td>{{ transaksi.tanggal_transaksi|date:"d M Y H:i" }}</td>
+                            {% if is_admin %}
+                            <td><i class="fas fa-user me-1"></i>{{ transaksi.user.username }}</td>
+                            {% endif %}
+                            <td><span class="badge bg-secondary">{{ transaksi.jenis_sampah.nama }}</span></td>
+                            <td><strong>{{ transaksi.berat }}</strong></td>
+                            <td class="text-success">Rp {{ transaksi.total_harga|floatformat:0 }}</td>
+                            <td><i class="fas fa-map-marker-alt me-1 text-danger"></i>{{ transaksi.bank_sampah.nama }}</td>
+                            <td>
+                                {% if transaksi.status == 'selesai' %}
+                                <span class="badge badge-status bg-success"><i class="fas fa-check-circle me-1"></i>Selesai</span>
+                                {% elif transaksi.status == 'diproses' %}
+                                <span class="badge badge-status bg-warning"><i class="fas fa-spinner me-1"></i>Diproses</span>
+                                {% elif transaksi.status == 'pending' %}
+                                <span class="badge badge-status bg-info"><i class="fas fa-clock me-1"></i>Pending</span>
+                                {% else %}
+                                <span class="badge badge-status bg-danger"><i class="fas fa-times-circle me-1"></i>Dibatalkan</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if is_admin %}7{% else %}6{% endif %}" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                Belum ada transaksi
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+Chart.defaults.color = '#666';
+
+const trendCtx = document.getElementById('wasteTrendChart').getContext('2d');
+const trendChart = new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ trend_labels|safe }},
+        datasets: [{
+            label: 'Berat Sampah (kg)',
+            data: {{ trend_values|safe }},
+            borderColor: '#198754',
+            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#198754',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: { usePointStyle: true, padding: 15, font: { size: 12, weight: 'bold' } }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: { label: function(ctx) { return 'Total: ' + ctx.parsed.y.toFixed(1) + ' kg'; } }
+            }
+        },
+        scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { callback: function(v) { return v + ' kg'; } } },
+            x: { grid: { display: false } }
+        }
+    }
+});
+
+const wasteCtx = document.getElementById('wasteTypeChart').getContext('2d');
+const wasteChart = new Chart(wasteCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ waste_labels|safe }},
+        datasets: [{
+            data: {{ waste_values|safe }},
+            backgroundColor: {{ waste_colors|safe }},
+            borderWidth: 3,
+            borderColor: '#fff',
+            hoverOffset: 10
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } },
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: function(ctx) {
+                        const label = ctx.label || '';
+                        const value = ctx.parsed || 0;
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const pct = ((value / total) * 100).toFixed(1);
+                        return label + ': ' + value.toFixed(1) + ' kg (' + pct + '%)';
+                    }
+                }
+            }
+        }
+    }
+});
+
+{% if is_admin and bank_ranking %}
+const bankCtx = document.getElementById('bankRankingChart').getContext('2d');
+const bankChart = new Chart(bankCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for b in bank_ranking %}'{{ b.bank_sampah__nama }}',{% endfor %}],
+        datasets: [{
+            label: 'Total Sampah (kg)',
+            data: [{% for b in bank_ranking %}{{ b.total_berat }},{% endfor %}],
+            backgroundColor: 'rgba(25, 135, 84, 0.8)',
+            borderColor: 'rgba(25, 135, 84, 1)',
+            borderWidth: 2,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: function(ctx) { return 'Total: ' + ctx.parsed.x.toFixed(1) + ' kg'; } } }
+        },
+        scales: {
+            x: { beginAtZero: true, ticks: { callback: function(v) { return v + ' kg'; } } },
+            y: { grid: { display: false } }
+        }
+    }
+});
+{% endif %}
+
+document.querySelectorAll('input[name="filter"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        const filterType = this.value;
+        const monthFilter = document.getElementById('monthFilter');
+        const yearFilter = document.getElementById('yearFilter');
+        
+        if (filterType === 'monthly') {
+            monthFilter.style.display = 'block';
+            yearFilter.style.display = 'block';
+        } else if (filterType === 'yearly') {
+            monthFilter.style.display = 'none';
+            yearFilter.style.display = 'block';
+        } else {
+            monthFilter.style.display = 'none';
+            yearFilter.style.display = 'none';
+        }
+    });
+});
+
+function exportData() {
+    alert('Fitur export data akan segera tersedia!\n\nAnda akan dapat mengexport data ke format:\n- Excel (.xlsx)\n- PDF\n- CSV');
+}
+</script>
+{% endblock %}

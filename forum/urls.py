@@ -10,6 +10,7 @@ urlpatterns = [
     path('diskusi/baru/', views.DiskusiCreateView.as_view(), name='diskusi_baru'),
     path('diskusi/<slug:slug>/', views.DiskusiDetailView.as_view(), name='diskusi_detail'),
     path('diskusi/<slug:slug>/edit/', views.DiskusiUpdateView.as_view(), name='diskusi_edit'),
+    path('diskusi/<slug:slug>/hapus/', views.DiskusiDeleteView.as_view(), name='diskusi_hapus'),
     path('diskusi/<slug:slug>/komentar/', views.KomentarCreateView.as_view(), name='komentar_baru'),
     path('komentar/<int:pk>/edit/', views.KomentarUpdateView.as_view(), name='edit_komentar'),
     path('komentar/<int:pk>/hapus/', views.KomentarDeleteView.as_view(), name='hapus_komentar'),

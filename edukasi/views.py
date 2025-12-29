@@ -4,6 +4,7 @@ from manajemen.models import Artikel, KategoriArtikel
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import EducationalContent
+from .services import ExternalContentService
 
 def artikel_list(request):
     artikel_list = Artikel.objects.all().order_by('-tanggal_publikasi')
@@ -13,7 +14,7 @@ def artikel_list(request):
         'artikel_list': artikel_list,
         'kategori_list': kategori_list,
     }
-    return render(request, 'edukasi/artikel_list.html', context)
+    return render(request, 'edukasi/edukasi_list.html', context)
 
 def artikel_by_kategori(request, slug):
     kategori = get_object_or_404(KategoriArtikel, slug=slug)
@@ -25,7 +26,7 @@ def artikel_by_kategori(request, slug):
         'artikel_list': artikel_list,
         'kategori_list': kategori_list,
     }
-    return render(request, 'edukasi/artikel_list.html', context)
+    return render(request, 'edukasi/edukasi_list.html', context)
 
 def artikel_detail(request, slug):
     artikel = get_object_or_404(Artikel, slug=slug)
@@ -41,7 +42,7 @@ def artikel_detail(request, slug):
         'artikel': artikel,
         'artikel_terkait': artikel_terkait,
     }
-    return render(request, 'edukasi/artikel_detail.html', context)
+    return render(request, 'edukasi/article_detail.html', context)
 
 def artikel_search(request):
     query = request.GET.get('q', '')
@@ -94,3 +95,21 @@ def edukasi_search(request):
         'query': query,
     }
     return render(request, 'edukasi/edukasi_search.html', context)
+
+
+def external_news(request):
+    """View untuk menampilkan berita dari sumber eksternal"""
+    source = request.GET.get('source', 'all')
+    
+    if source == 'all':
+        articles = ExternalContentService.get_all_sources(limit_per_source=10)
+    else:
+        articles = ExternalContentService.get_rss_articles(source=source, limit=20)
+    
+    context = {
+        'articles': articles,
+        'source': source,
+        'available_sources': ExternalContentService.RSS_FEEDS.keys(),
+        'title': 'Berita Lingkungan Terkini'
+    }
+    return render(request, 'edukasi/external_news.html', context)

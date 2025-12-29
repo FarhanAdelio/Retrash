@@ -1,0 +1,548 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ReTrash{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* Hero Section */
+    .tracking-hero {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 8rem 0 6rem;
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .tracking-hero::before {
+        content: '';
+        position: absolute;
+        width: 150%;
+        height: 150%;
+        top: -25%;
+        right: -25%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .tracking-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100"><path fill="white" d="M0,48L80,53.3C160,59,320,69,480,69.3C640,69,800,59,960,58.7C1120,59,1280,69,1360,74.7L1440,80L1440,100L0,100Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+    }
+
+    .hero-icon {
+        font-size: 8rem;
+        color: rgba(255,255,255,0.2);
+        animation: float 3s ease-in-out infinite;
+        position: absolute;
+        right: 10%;
+        top: 20%;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-30px) rotate(5deg); }
+    }
+
+    /* Search Box */
+    .tracking-search-box {
+        background: white;
+        border-radius: 2rem;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        position: relative;
+        z-index: 2;
+    }
+
+    .search-input-group {
+        position: relative;
+    }
+
+    .search-input-group .form-control {
+        height: 70px;
+        border-radius: 1rem;
+        border: 3px solid #e9ecef;
+        padding-left: 70px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .search-input-group .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.5rem rgba(25, 135, 84, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        color: #198754;
+        z-index: 3;
+    }
+
+    .btn-track {
+        height: 70px;
+        padding: 0 3rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border: none;
+        box-shadow: 0 8px 25px rgba(25, 135, 84, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-track::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-track:hover::before {
+        left: 100%;
+    }
+
+    .btn-track:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(25, 135, 84, 0.4);
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 5rem 0;
+        background: linear-gradient(to bottom, #f8f9fa 0%, white 100%);
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, #198754 0%, #20c997 100%);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 20px 50px rgba(25, 135, 84, 0.15);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px rgba(25, 135, 84, 0.25);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-card h4 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+        color: #6c757d;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    /* How It Works */
+    .how-it-works {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .step-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f8f9fa 100%);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        text-align: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .step-card:hover {
+        background: white;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        transform: scale(1.05);
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: white;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 20px rgba(25, 135, 84, 0.3);
+    }
+
+    .step-card h5 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quick-actions::before {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        top: -200px;
+        left: -200px;
+        animation: pulse-slow 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse-slow {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    .action-btn {
+        background: white;
+        color: #198754;
+        padding: 1.5rem 2rem;
+        border-radius: 1rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        color: #20c997;
+    }
+
+    .action-btn i {
+        font-size: 2rem;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    /* Sample Tracking Code */
+    .sample-code {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        border-left: 4px solid #198754;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #198754;
+        display: inline-block;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="tracking-hero">
+    <i class="fas fa-route hero-icon"></i>
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center text-white">
+                <div data-aos="fade-down">
+                    <span class="badge bg-white text-success px-3 py-2 mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>Sistem Tracking Real-Time
+                    </span>
+                </div>
+                <h1 class="display-3 fw-bold mb-4" data-aos="fade-up" data-aos-delay="100">
+                    Lacak Pengiriman Sampah Anda
+                </h1>
+                <p class="lead mb-5" data-aos="fade-up" data-aos-delay="200">
+                    Pantau perjalanan sampah Anda dari rumah hingga pusat daur ulang secara real-time
+                </p>
+
+                <!-- Search Box -->
+                <div class="tracking-search-box" data-aos="zoom-in" data-aos-delay="300">
+                    <h4 class="mb-4 text-dark">Masukkan Kode Tracking</h4>
+                    <form id="trackingForm">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-8">
+                                <div class="search-input-group">
+                                    <i class="fas fa-barcode search-icon"></i>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="kodeTracking" 
+                                           placeholder="RTR-20250101-XXXXX"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-track btn-success w-100">
+                                    <i class="fas fa-search me-2"></i>Lacak Sekarang
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="text-muted mt-3 mb-0">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Contoh kode tracking: 
+                            <span class="sample-code">RTR-20250129-A1B2C</span>
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-success px-3 py-2 mb-2">
+                <i class="fas fa-star me-2"></i>Keunggulan Kami
+            </span>
+            <h2 class="display-5 fw-bold mt-2">Mengapa Menggunakan Tracking ReTrash?</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Sistem tracking terdepan dengan teknologi real-time untuk transparansi penuh
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h4>Real-Time Tracking</h4>
+                    <p>
+                        Pantau lokasi pengiriman sampah Anda secara langsung dengan akurasi GPS yang tinggi
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h4>Notifikasi Instant</h4>
+                    <p>
+                        Dapatkan pemberitahuan setiap perubahan status pengiriman langsung ke perangkat Anda
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h4>Riwayat Lengkap</h4>
+                    <p>
+                        Lihat seluruh timeline perjalanan sampah dengan detail waktu dan lokasi di setiap tahap
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-success px-3 py-2 mb-2">
+                <i class="fas fa-question-circle me-2"></i>Cara Kerja
+            </span>
+            <h2 class="display-5 fw-bold mt-2">Mudah & Cepat</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h5>Buat Permintaan</h5>
+                    <p class="text-muted">Ajukan penjemputan sampah melalui platform kami</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h5>Dapatkan Kode</h5>
+                    <p class="text-muted">Terima kode tracking unik untuk pengiriman Anda</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h5>Lacak Perjalanan</h5>
+                    <p class="text-muted">Pantau status real-time dengan memasukkan kode</p>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h5>Dapatkan Poin</h5>
+                    <p class="text-muted">Peroleh reward points setelah sampah diproses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="quick-actions">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row g-4">
+            <div class="col-md-6" data-aos="fade-right">
+                <a href="{% url 'tracking:create' %}" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div>
+                        <div>Buat Permintaan Penjemputan</div>
+                        <small style="opacity: 0.8;">Jadwalkan penjemputan sampah Anda</small>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <a href="{% url 'tracking:my_shipments' %}" class="action-btn">
+                    <div class="action-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div>
+                        <div>Lihat Pengiriman Saya</div>
+                        <small style="opacity: 0.8;">Akses riwayat semua pengiriman</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50
+    });
+
+    // Form submission
+    document.getElementById('trackingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const kode = document.getElementById('kodeTracking').value.trim();
+        
+        if (!kode) {
+            showToast('Mohon masukkan kode tracking', 'warning');
+            return;
+        }
+
+        // Show loading
+        const btn = this.querySelector('button[type="submit"]');
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mencari...';
+
+        // Fetch tracking
+        fetch(`/tracking/search/?kode=${encodeURIComponent(kode)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    showToast(data.error || 'Kode tracking tidak ditemukan', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHTML;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan, silakan coba lagi', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            });
+    });
+
+    // Auto format kode tracking
+    document.getElementById('kodeTracking').addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase();
+    });
+</script>
+{% endblock %}

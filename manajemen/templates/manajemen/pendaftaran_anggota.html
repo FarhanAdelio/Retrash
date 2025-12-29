@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pendaftaran Anggota Bank Sampah{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus"></i> Pendaftaran Anggota Bank Sampah</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Lengkapi formulir di bawah ini untuk mendaftar sebagai anggota bank sampah. 
+                        Data Anda akan diverifikasi oleh admin maksimal 3x24 jam.
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Data Pribadi -->
+                        <h5 class="mt-4 mb-3 text-success">
+                            <i class="fas fa-user"></i> Data Pribadi
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                {{ form.nama_lengkap }}
+                                {% if form.nama_lengkap.errors %}
+                                    <div class="text-danger small">{{ form.nama_lengkap.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">NIK <span class="text-danger">*</span></label>
+                                {{ form.nik }}
+                                <small class="form-text text-muted">16 digit nomor KTP</small>
+                                {% if form.nik.errors %}
+                                    <div class="text-danger small">{{ form.nik.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nomor Telepon/WhatsApp <span class="text-danger">*</span></label>
+                                {{ form.nomor_telepon }}
+                                {% if form.nomor_telepon.errors %}
+                                    <div class="text-danger small">{{ form.nomor_telepon.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Data Alamat -->
+                        <h5 class="mt-4 mb-3 text-success">
+                            <i class="fas fa-map-marker-alt"></i> Alamat Lengkap
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label">Alamat Lengkap <span class="text-danger">*</span></label>
+                            {{ form.alamat_lengkap }}
+                            {% if form.alamat_lengkap.errors %}
+                                <div class="text-danger small">{{ form.alamat_lengkap.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">RT/RW <span class="text-danger">*</span></label>
+                                {{ form.rt_rw }}
+                                {% if form.rt_rw.errors %}
+                                    <div class="text-danger small">{{ form.rt_rw.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Kelurahan/Desa <span class="text-danger">*</span></label>
+                                {{ form.kelurahan }}
+                                {% if form.kelurahan.errors %}
+                                    <div class="text-danger small">{{ form.kelurahan.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Kecamatan <span class="text-danger">*</span></label>
+                                {{ form.kecamatan }}
+                                {% if form.kecamatan.errors %}
+                                    <div class="text-danger small">{{ form.kecamatan.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kota/Kabupaten <span class="text-danger">*</span></label>
+                                {{ form.kota }}
+                                {% if form.kota.errors %}
+                                    <div class="text-danger small">{{ form.kota.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kode Pos <span class="text-danger">*</span></label>
+                                {{ form.kode_pos }}
+                                {% if form.kode_pos.errors %}
+                                    <div class="text-danger small">{{ form.kode_pos.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Data Tambahan -->
+                        <h5 class="mt-4 mb-3 text-success">
+                            <i class="fas fa-recycle"></i> Informasi Tambahan
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Bank Sampah Terdekat</label>
+                            {{ form.bank_sampah }}
+                            {% if form.bank_sampah.errors %}
+                                <div class="text-danger small">{{ form.bank_sampah.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Sampah yang Akan Disetor</label>
+                            <div class="ms-3">
+                                {{ form.jenis_sampah_disetor }}
+                            </div>
+                            {% if form.jenis_sampah_disetor.errors %}
+                                <div class="text-danger small">{{ form.jenis_sampah_disetor.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Estimasi Volume Sampah per Bulan (kg)</label>
+                            {{ form.estimasi_volume }}
+                            {% if form.estimasi_volume.errors %}
+                                <div class="text-danger small">{{ form.estimasi_volume.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Foto KTP <span class="text-danger">*</span></label>
+                            {{ form.foto_ktp }}
+                            <small class="form-text text-muted">Upload foto KTP yang jelas (format: JPG, PNG, max 2MB)</small>
+                            {% if form.foto_ktp.errors %}
+                                <div class="text-danger small">{{ form.foto_ktp.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Alasan Bergabung (Opsional)</label>
+                            {{ form.alasan_bergabung }}
+                            {% if form.alasan_bergabung.errors %}
+                                <div class="text-danger small">{{ form.alasan_bergabung.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-paper-plane"></i> Kirim Pendaftaran
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,81 +3,692 @@
 
 {% block title %}{{ title }} - ReTrash{% endblock %}
 
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* ========== HEADER SECTION ========== */
+    .contact-header {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 5rem 0 4rem;
+    }
+
+    .contact-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+    }
+
+    .contact-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        letter-spacing: -1px;
+    }
+
+    .contact-header p {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.25rem;
+    }
+
+    .header-icon {
+        font-size: 6rem;
+        color: rgba(255, 255, 255, 0.2);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* ========== CONTACT FORM ========== */
+    .contact-form-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        overflow: hidden;
+    }
+
+    .contact-form-card:hover {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+        border-bottom: 3px solid #198754;
+    }
+
+    .form-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-header .icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        color: #198754;
+        font-size: 1rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.1);
+        background: white;
+        transform: translateY(-2px);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #20c997;
+        background: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .char-counter {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-align: right;
+        margin-top: 0.25rem;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+        box-shadow: 0 8px 20px rgba(25, 135, 84, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-submit:hover::before {
+        left: 100%;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(25, 135, 84, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(-1px);
+    }
+
+    /* ========== CONTACT INFO CARDS ========== */
+    .info-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .info-card:hover {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        transform: translateY(-8px);
+    }
+
+    .info-card-header {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        padding: 2rem;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-card-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .info-card-header h4 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.4rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-card-header p {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Modern Contact Item */
+    .contact-item-modern {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .contact-item-modern:last-child {
+        border-bottom: none;
+    }
+
+    .contact-item-modern:hover {
+        transform: translateX(5px);
+    }
+
+    .icon-wrapper-modern {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 15px rgba(25, 135, 84, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .contact-item-modern:hover .icon-wrapper-modern {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(25, 135, 84, 0.3);
+    }
+
+    .contact-content {
+        flex: 1;
+    }
+
+    .contact-content h6 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+
+    .contact-content p {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .contact-link {
+        color: #198754;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .contact-link:hover {
+        color: #20c997;
+        transform: translateX(3px);
+    }
+
+    /* ========== FAQ SECTION ========== */
+    .faq-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 5rem 0;
+        margin-top: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .faq-card {
+        border: none;
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .faq-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateX(5px);
+    }
+
+    .faq-header {
+        background: white;
+        padding: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .faq-header:hover {
+        background: linear-gradient(90deg, rgba(25, 135, 84, 0.05) 0%, white 100%);
+    }
+
+    .faq-header h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .faq-header .icon {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .faq-toggle {
+        width: 30px;
+        height: 30px;
+        background: #f8f9fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #198754;
+        transition: all 0.3s ease;
+    }
+
+    .faq-header[aria-expanded="true"] .faq-toggle {
+        background: #198754;
+        color: white;
+        transform: rotate(180deg);
+    }
+
+    .faq-body {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-top: 2px solid #e9ecef;
+    }
+
+    /* ========== RESPONSE ANIMATION ========== */
+    .success-animation {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: white;
+        padding: 3rem;
+        border-radius: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        display: none;
+    }
+
+    .success-animation.show {
+        display: block;
+        animation: successPop 0.5s ease-out;
+    }
+
+    @keyframes successPop {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 991.98px) {
+        .contact-header h1 {
+            font-size: 2.5rem;
+        }
+
+        .contact-header {
+            padding: 3rem 0 2rem;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+        }
+    }
+
+    /* FAQ Section */
+    .faq-section {
+        padding: 5rem 0;
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+    }
+
+    .faq-card {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .faq-card:hover {
+        box-shadow: 0 8px 25px rgba(25, 135, 84, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .faq-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        width: 100%;
+    }
+
+    .faq-header:hover {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+    }
+
+    .faq-header:hover h6,
+    .faq-header:hover .icon {
+        color: white !important;
+    }
+
+    .faq-header h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .faq-header .icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .faq-toggle {
+        width: 35px;
+        height: 35px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #198754;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .faq-header.collapsed .faq-toggle i {
+        transform: rotate(0deg);
+    }
+
+    .faq-header:not(.collapsed) .faq-toggle i {
+        transform: rotate(180deg);
+    }
+
+    .faq-body {
+        padding: 1.5rem;
+        background: white;
+        color: #6c757d;
+        line-height: 1.8;
+    }
+
+    @media (max-width: 991.98px) {
+        .faq-section {
+            padding: 3rem 0;
+        }
+
+        .faq-header h6 {
+            font-size: 0.95rem;
+        }
+
+        .faq-header .icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Header Section -->
-<section class="py-5 bg-light">
-    <div class="container">
+<!-- Header Section with Gradient -->
+<section class="contact-header">
+    <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">{{ title }}</h1>
-                <p class="lead text-muted">Hubungi kami untuk informasi lebih lanjut atau kirimkan pesan Anda.</p>
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="mb-3">
+                    <span class="badge bg-white text-success px-3 py-2 shadow-sm">
+                        <i class="fas fa-headset me-2"></i>Customer Support
+                    </span>
+                </div>
+                <h1 class="mb-4">{{ title }}</h1>
+                <p class="lead mb-4">
+                    Hubungi kami untuk informasi lebih lanjut atau kirimkan pesan Anda. 
+                    Tim kami siap membantu Anda 24/7!
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <div class="d-flex align-items-center text-white">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Respon Cepat</span>
+                    </div>
+                    <div class="d-flex align-items-center text-white">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Tim Profesional</span>
+                    </div>
+                    <div class="d-flex align-items-center text-white">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Solusi Terpercaya</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center d-none d-lg-block" data-aos="fade-left">
+                <i class="fas fa-comments header-icon"></i>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Contact Section -->
+<!-- Contact Section with Modern Design -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
+        <div class="row g-4">
             <!-- Contact Form -->
-            <div class="col-lg-8 mb-4 mb-lg-0">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4">Kirim Pesan</h4>
-                        
+            <div class="col-lg-8" data-aos="fade-up">
+                <div class="contact-form-card">
+                    <div class="form-header">
+                        <h4>
+                            <div class="icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            Kirim Pesan Kepada Kami
+                        </h4>
+                        <p class="text-muted mb-0 mt-2">Isi formulir di bawah ini dan kami akan menghubungi Anda segera</p>
+                    </div>
+                    
+                    <div class="p-4 p-lg-5">
                         {% if messages %}
                         {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-pill shadow-sm" role="alert" data-aos="fade-down">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>{{ message }}</strong>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor %}
                         {% endif %}
                         
-                        <form method="post">
+                        <form method="post" id="contactForm">
                             {% csrf_token %}
                             
-                            <div class="mb-3">
-                                <label for="{{ form.nama.id_for_label }}" class="form-label">Nama</label>
-                                {{ form.nama.errors }}
-                                <input type="text" class="form-control {% if form.nama.errors %}is-invalid{% endif %}" 
-                                       id="{{ form.nama.id_for_label }}" 
-                                       name="{{ form.nama.html_name }}" 
-                                       required>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.nama.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user"></i>Nama Lengkap
+                                    </label>
+                                    {{ form.nama.errors }}
+                                    <input type="text" 
+                                           class="form-control {% if form.nama.errors %}is-invalid{% endif %}" 
+                                           id="{{ form.nama.id_for_label }}" 
+                                           name="{{ form.nama.html_name }}" 
+                                           placeholder="Masukkan nama Anda"
+                                           required>
+                                    <div class="invalid-feedback">
+                                        Silakan masukkan nama Anda
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="fas fa-envelope"></i>Alamat Email
+                                    </label>
+                                    {{ form.email.errors }}
+                                    <input type="email" 
+                                           class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                           id="{{ form.email.id_for_label }}" 
+                                           name="{{ form.email.html_name }}" 
+                                           placeholder="nama@email.com"
+                                           required>
+                                    <div class="invalid-feedback">
+                                        Silakan masukkan email yang valid
+                                    </div>
+                                </div>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                                {{ form.email.errors }}
-                                <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
-                                       id="{{ form.email.id_for_label }}" 
-                                       name="{{ form.email.html_name }}" 
-                                       required>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="{{ form.subjek.id_for_label }}" class="form-label">Subjek</label>
+                            <div class="mt-4">
+                                <label for="{{ form.subjek.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag"></i>Subjek Pesan
+                                </label>
                                 {{ form.subjek.errors }}
-                                <input type="text" class="form-control {% if form.subjek.errors %}is-invalid{% endif %}" 
+                                <input type="text" 
+                                       class="form-control {% if form.subjek.errors %}is-invalid{% endif %}" 
                                        id="{{ form.subjek.id_for_label }}" 
                                        name="{{ form.subjek.html_name }}" 
+                                       placeholder="Apa yang bisa kami bantu?"
                                        required>
+                                <div class="invalid-feedback">
+                                    Silakan masukkan subjek pesan
+                                </div>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="{{ form.pesan.id_for_label }}" class="form-label">Pesan</label>
+                            <div class="mt-4">
+                                <label for="{{ form.pesan.id_for_label }}" class="form-label">
+                                    <i class="fas fa-comment-dots"></i>Pesan Anda
+                                </label>
                                 {{ form.pesan.errors }}
                                 <textarea class="form-control {% if form.pesan.errors %}is-invalid{% endif %}" 
                                           id="{{ form.pesan.id_for_label }}" 
                                           name="{{ form.pesan.html_name }}" 
-                                          rows="5" 
+                                          rows="6" 
+                                          placeholder="Tulis pesan Anda di sini..."
+                                          maxlength="1000"
                                           required></textarea>
+                                <div class="char-counter">
+                                    <span id="charCount">0</span> / 1000 karakter
+                                </div>
+                                <div class="invalid-feedback">
+                                    Silakan masukkan pesan Anda
+                                </div>
                             </div>
                             
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
-                            </button>
+                            <div class="mt-4 pt-3">
+                                <button type="submit" class="btn-submit w-100 w-md-auto">
+                                    <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
+                                    <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -85,83 +696,193 @@
             
             <!-- Contact Info -->
             <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4">Informasi Kontak</h4>
-                        
-                        <div class="d-flex mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
-                                    <i class="fas fa-map-marker-alt text-success"></i>
-                                </div>
+                <!-- Contact Information Card -->
+                <div class="info-card mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="info-card-header">
+                        <i class="fas fa-address-book mb-3" style="font-size: 2.5rem;"></i>
+                        <h4>Informasi Kontak</h4>
+                        <p class="mb-0 mt-2" style="font-size: 0.9rem; opacity: 0.9;">Hubungi kami kapan saja</p>
+                    </div>
+                    
+                    <div style="padding: 1.5rem;">
+                        <div class="contact-item-modern">
+                            <div class="icon-wrapper-modern">
+                                <i class="fas fa-map-marker-alt"></i>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-1">Alamat</h6>
-                                <p class="mb-0 text-muted">{{ alamat }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
-                                    <i class="fas fa-phone text-success"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-1">Telepon</h6>
-                                <p class="mb-0">
-                                    <a href="tel:{{ telepon }}" class="text-muted text-decoration-none">{{ telepon }}</a>
-                                </p>
+                            <div class="contact-content">
+                                <h6>Alamat Kantor</h6>
+                                <p>{{ alamat }}</p>
                             </div>
                         </div>
                         
-                        <div class="d-flex mb-3">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
-                                    <i class="fas fa-envelope text-success"></i>
-                                </div>
+                        <div class="contact-item-modern">
+                            <div class="icon-wrapper-modern">
+                                <i class="fas fa-phone-alt"></i>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-1">Email</h6>
-                                <p class="mb-0">
-                                    <a href="mailto:{{ email }}" class="text-muted text-decoration-none">{{ email }}</a>
-                                </p>
+                            <div class="contact-content">
+                                <h6>Telepon</h6>
+                                <a href="tel:{{ telepon }}" class="contact-link">{{ telepon }}</a>
                             </div>
                         </div>
                         
-                        <div class="d-flex">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
-                                    <i class="fas fa-clock text-success"></i>
-                                </div>
+                        <div class="contact-item-modern">
+                            <div class="icon-wrapper-modern">
+                                <i class="fas fa-envelope"></i>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-1">Jam Kerja</h6>
-                                <p class="mb-0 text-muted">{{ jam_kerja }}</p>
+                            <div class="contact-content">
+                                <h6>Email</h6>
+                                <a href="mailto:{{ email }}" class="contact-link">{{ email }}</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item-modern">
+                            <div class="icon-wrapper-modern">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-content">
+                                <h6>Jam Operasional</h6>
+                                <p>{{ jam_kerja }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Social Media -->
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4">Ikuti Kami</h4>
-                        <div class="d-flex gap-2">
-                            <a href="#" class="btn btn-outline-primary">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-info">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-danger">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-success">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="badge bg-success px-3 py-2 mb-2">
+                <i class="fas fa-question-circle me-2"></i>FAQ
+            </span>
+            <h2 class="display-5 fw-bold mt-2">Pertanyaan yang Sering Diajukan</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Temukan jawaban atas pertanyaan umum tentang layanan kami
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="faq-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="faq-header" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true">
+                            <h6>
+                                <div class="icon">
+                                    <i class="fas fa-recycle"></i>
+                                </div>
+                                Bagaimana cara mendaftar sebagai anggota ReTrash?
+                            </h6>
+                            <div class="faq-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div id="faq1" class="collapse show" data-bs-parent="#faqAccordion">
+                            <div class="faq-body">
+                                <p class="mb-0">
+                                    Untuk mendaftar, klik tombol "Daftar" di halaman utama, isi formulir pendaftaran dengan data yang valid, 
+                                    dan tunggu verifikasi dari tim kami. Proses verifikasi biasanya memakan waktu 1-2 hari kerja.
+                                </p>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="faq-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="faq-header collapsed" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <h6>
+                                <div class="icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                Bagaimana sistem poin bekerja?
+                            </h6>
+                            <div class="faq-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div id="faq2" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="faq-body">
+                                <p class="mb-0">
+                                    Setiap jenis sampah memiliki nilai poin berbeda berdasarkan berat dan kategori. 
+                                    Poin yang terkumpul dapat ditukarkan dengan hadiah menarik atau dapat ditransfer ke rekening bank Anda.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="faq-header collapsed" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <h6>
+                                <div class="icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                Apakah ada layanan penjemputan sampah?
+                            </h6>
+                            <div class="faq-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div id="faq3" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="faq-body">
+                                <p class="mb-0">
+                                    Ya, kami menyediakan layanan penjemputan sampah untuk area tertentu. 
+                                    Anda dapat menjadwalkan penjemputan melalui dashboard atau menghubungi kami langsung.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="faq-header collapsed" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            <h6>
+                                <div class="icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                Berapa lama proses pencairan poin?
+                            </h6>
+                            <div class="faq-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div id="faq4" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="faq-body">
+                                <p class="mb-0">
+                                    Proses pencairan poin biasanya memakan waktu 3-5 hari kerja setelah pengajuan disetujui. 
+                                    Dana akan langsung ditransfer ke rekening bank yang terdaftar.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-card" data-aos="fade-up" data-aos-delay="500">
+                        <div class="faq-header collapsed" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            <h6>
+                                <div class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                Jenis sampah apa saja yang diterima?
+                            </h6>
+                            <div class="faq-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div id="faq5" class="collapse" data-bs-parent="#faqAccordion">
+                            <div class="faq-body">
+                                <p class="mb-0">
+                                    Kami menerima berbagai jenis sampah seperti plastik, kertas, logam, dan elektronik. 
+                                    Untuk informasi lengkap tentang jenis sampah dan harganya, silakan cek halaman Bank Sampah kami.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <p class="text-muted mb-3">Masih ada pertanyaan lain?</p>
+                    <a href="#contactForm" class="btn btn-success btn-lg px-5 smooth-scroll">
+                        <i class="fas fa-comment-dots me-2"></i>Hubungi Kami
+                    </a>
                 </div>
             </div>
         </div>
@@ -183,12 +904,153 @@
     </div>
 </section> {% endcomment %}
 
-{% block extra_css %}
-<style>
-    .form-control:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
-    }
-</style>
-{% endblock %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counter for textarea
+        const textarea = document.getElementById('{{ form.pesan.id_for_label }}');
+        const charCount = document.getElementById('charCount');
+        
+        if (textarea && charCount) {
+            textarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+                
+                // Change color based on character count
+                if (this.value.length > 900) {
+                    charCount.style.color = '#dc3545';
+                } else if (this.value.length > 700) {
+                    charCount.style.color = '#ffc107';
+                } else {
+                    charCount.style.color = '#6c757d';
+                }
+            });
+        }
+
+        // Form validation and submission
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                
+                // Show loading state
+                if (submitBtn) {
+                    const originalHTML = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengirim...';
+                    
+                    // Re-enable after 10 seconds (failsafe)
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHTML;
+                    }, 10000);
+                }
+            });
+
+            // Input animations
+            const inputs = contactForm.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a.smooth-scroll').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            });
+        });
+
+        // FAQ accordion animation
+        const faqHeaders = document.querySelectorAll('.faq-header');
+        faqHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                // Close other open FAQs
+                faqHeaders.forEach(h => {
+                    if (h !== header) {
+                        h.classList.add('collapsed');
+                    }
+                });
+                
+                // Toggle current FAQ
+                this.classList.toggle('collapsed');
+            });
+        });
+
+        // Add ripple effect to buttons
+        const buttons = document.querySelectorAll('.btn-submit');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Auto-resize textarea
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+    });
+
+    // Add ripple CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .focused label {
+            color: #198754 !important;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+
 {% endblock %} 

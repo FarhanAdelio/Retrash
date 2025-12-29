@@ -4,224 +4,305 @@
 {% block title %}{{ diskusi.judul }} - Forum ReTrash{% endblock %}
 
 {% block content %}
-<div class="forum-header bg-success text-white py-5 mb-5">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item"><a href="{% url 'forum:list' %}" class="text-white text-decoration-none">Forum</a></li>
-                <li class="breadcrumb-item active text-white-50" aria-current="page">{{ diskusi.judul }}</li>
+<!-- Forum Header with Breadcrumb -->
+<section class="forum-header position-relative">
+    <div class="header-overlay"></div>
+    <div class="container position-relative" style="z-index: 2; padding: 3rem 0 2rem;">
+        <nav aria-label="breadcrumb" data-aos="fade-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'forum:list' %}" class="text-white text-decoration-none">
+                        <i class="fas fa-comments me-1"></i>Forum
+                    </a>
+                </li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">
+                    {{ diskusi.judul|truncatewords:5 }}
+                </li>
             </ol>
         </nav>
     </div>
-</div>
+</section>
 
-<div class="container pb-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Diskusi Card -->
-            <div class="card border-0 shadow-sm mb-5 discussion-detail">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div class="d-flex gap-3">
-                            <img src="{{ diskusi.penulis.profile.avatar.url|default:'/static/images/default-avatar.png' }}" 
+        <div class="col-lg-9">
+            <!-- Main Discussion Card -->
+            <div class="card border-0 shadow-sm mb-4 discussion-detail" data-aos="fade-up">
+                <div class="card-body p-4 p-md-5">
+                    <!-- Discussion Header -->
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="flex-shrink-0">
+                            <img src="https://ui-avatars.com/api/?name={{ diskusi.penulis.username }}&background=198754&color=fff&size=64" 
                                  alt="{{ diskusi.penulis.username }}" 
-                                 class="rounded-circle discussion-avatar">
-                            <div>
-                                <h1 class="h3 mb-2">{{ diskusi.judul }}</h1>
-                                <div class="d-flex align-items-center text-muted small">
-                                    <span class="fw-medium text-success">{{ diskusi.penulis.username }}</span>
-                                    <span class="mx-2">•</span>
-                                    <span>{{ diskusi.created_at|timesince }} yang lalu</span>
-                                    <span class="mx-2">•</span>
-                                    <span><i class="far fa-eye me-1"></i>{{ diskusi.view_count }} dilihat</span>
-                                    <span class="mx-2">•</span>
-                                    <span><i class="far fa-comment me-1"></i>{{ diskusi.jumlah_komentar }} komentar</span>
+                                 class="rounded-circle discussion-avatar shadow-sm">
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h1 class="h3 mb-2 fw-bold">{{ diskusi.judul }}</h1>
+                                    <div class="d-flex align-items-center flex-wrap gap-3 text-muted small">
+                                        <span class="d-flex align-items-center">
+                                            <i class="fas fa-user-circle me-2 text-success"></i>
+                                            <strong class="text-success">{{ diskusi.penulis.username }}</strong>
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="far fa-clock me-2"></i>
+                                            {{ diskusi.created_at|timesince }} yang lalu
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="far fa-eye me-2"></i>
+                                            {{ diskusi.view_count }}
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="far fa-comment me-2"></i>
+                                            {{ diskusi.jumlah_komentar }}
+                                        </span>
+                                    </div>
                                 </div>
+                                {% if request.user == diskusi.penulis %}
+                                <div class="dropdown">
+                                    <button class="btn btn-light rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'forum:diskusi_edit' diskusi.slug %}">
+                                                <i class="fas fa-edit me-2 text-success"></i>Edit Diskusi
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{% url 'forum:diskusi_hapus' diskusi.slug %}">
+                                                <i class="fas fa-trash-alt me-2"></i>Hapus Diskusi
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
-                        {% if request.user == diskusi.penulis %}
-                        <div class="dropdown">
-                            <button class="btn btn-light rounded-circle p-2" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'forum:diskusi_edit' diskusi.slug %}">
-                                        <i class="fas fa-edit me-2 text-success"></i>Edit Diskusi
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
                     </div>
 
+                    <hr class="my-4">
+
+                    <!-- Discussion Content -->
                     <div class="discussion-content mb-4">
                         {{ diskusi.isi|linebreaks }}
                     </div>
 
+                    <hr class="my-4">
+
                     <!-- Share Buttons -->
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted small">Bagikan:</span>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="text-muted small me-2">
+                            <i class="fas fa-share-nodes me-1"></i>Bagikan:
+                        </span>
                         <a href="https://wa.me/?text={{ request.build_absolute_uri }}" 
-                           class="btn btn-sm btn-success" target="_blank">
-                            <i class="fab fa-whatsapp"></i>
+                           class="btn btn-sm btn-success rounded-pill" target="_blank">
+                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
                         </a>
                         <a href="https://telegram.me/share/url?url={{ request.build_absolute_uri }}" 
-                           class="btn btn-sm btn-info text-white" target="_blank">
-                            <i class="fab fa-telegram"></i>
+                           class="btn btn-sm btn-info text-white rounded-pill" target="_blank">
+                            <i class="fab fa-telegram me-1"></i>Telegram
                         </a>
-                        <button class="btn btn-sm btn-light" 
-                                onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}')">
-                            <i class="fas fa-link"></i>
+                        <button class="btn btn-sm btn-light rounded-pill" 
+                                onclick="copyLink()" id="copyBtn">
+                            <i class="fas fa-link me-1"></i>Salin Link
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Komentar Section -->
-            <div class="comments-section">
-                <h4 class="mb-4">
-                    Komentar <span class="text-muted">({{ diskusi.jumlah_komentar }})</span>
+            <!-- Comments Section Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-up">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-comments text-success me-2"></i>
+                    Komentar <span class="badge bg-success-subtle text-success rounded-pill">{{ diskusi.jumlah_komentar }}</span>
                 </h4>
+            </div>
 
-                {% if user.is_authenticated %}
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <div class="d-flex gap-3">
-                            <img src="{{ user.profile.avatar.url|default:'/static/images/default-avatar.png' }}" 
+            <!-- Comment Form -->
+            {% if user.is_authenticated %}
+            <div class="card border-0 shadow-sm mb-4" data-aos="fade-up">
+                <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                        <div class="flex-shrink-0">
+                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=198754&color=fff&size=48" 
                                  alt="{{ user.username }}" 
                                  class="rounded-circle comment-avatar">
-                            <div class="flex-grow-1">
-                                <form method="post" action="{% url 'forum:komentar_baru' diskusi.slug %}">
-                                    {% csrf_token %}
-                                    <div class="mb-3">
-                                        <textarea class="form-control border-0 bg-light" 
-                                                  name="isi" 
-                                                  rows="3" 
-                                                  placeholder="Tulis komentar Anda..."
-                                                  required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-success">
+                        </div>
+                        <div class="flex-grow-1">
+                            <form method="post" action="{% url 'forum:komentar_baru' diskusi.slug %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <textarea class="form-control border-0 bg-light" 
+                                              name="isi" 
+                                              rows="4" 
+                                              placeholder="Tulis komentar Anda..."
+                                              required
+                                              style="resize: none;"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success rounded-pill px-4">
                                         <i class="fas fa-paper-plane me-2"></i>Kirim Komentar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-light border-0 shadow-sm mb-4" data-aos="fade-up">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle text-success fa-2x me-3"></i>
+                    <div>
+                        <strong>Silakan login untuk berkomentar</strong><br>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="text-success text-decoration-none">
+                            Klik di sini untuk login <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Comments List -->
+            <div class="comments-list">
+                {% for komentar in komentar_list %}
+                <div class="card border-0 shadow-sm mb-3 comment-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:50 }}">
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0">
+                                <img src="https://ui-avatars.com/api/?name={{ komentar.penulis.username }}&background=6c757d&color=fff&size=48" 
+                                     alt="{{ komentar.penulis.username }}" 
+                                     class="rounded-circle comment-avatar">
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <strong class="text-success">{{ komentar.penulis.username }}</strong>
+                                        <span class="text-muted ms-2 small">
+                                            <i class="far fa-clock me-1"></i>{{ komentar.created_at|timesince }} yang lalu
+                                        </span>
+                                    </div>
+                                    {% if komentar.penulis == request.user %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm rounded-pill" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'forum:edit_komentar' komentar.id %}">
+                                                    <i class="fas fa-edit me-2 text-success"></i>Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteKomentarModal{{ komentar.id }}">
+                                                    <i class="fas fa-trash-alt me-2"></i>Hapus
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="comment-content mb-3">
+                                    {{ komentar.isi|linebreaks }}
+                                </div>
+                                <button class="btn btn-link btn-sm text-muted p-0 text-decoration-none" onclick="balasKomentar('{{ komentar.penulis.username }}')">
+                                    <i class="fas fa-reply me-1"></i>Balas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Hapus Komentar -->
+                {% if komentar.penulis == request.user %}
+                <div class="modal fade" id="deleteKomentarModal{{ komentar.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title fw-bold">
+                                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                    Konfirmasi Hapus
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-0">Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan.</p>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                <form action="{% url 'forum:hapus_komentar' komentar.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                                        <i class="fas fa-trash-alt me-2"></i>Hapus
                                     </button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% else %}
-                <div class="alert alert-light border-0 shadow-sm mb-4">
-                    <i class="fas fa-info-circle text-success me-2"></i>
-                    Silakan <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">login</a> untuk menambahkan komentar.
-                </div>
                 {% endif %}
-
-                <div class="comments-list">
-                    {% for komentar in komentar_list %}
-                    <div class="comment-item card border-0 shadow-sm mb-3">
-                        <div class="card-body p-4">
-                            <div class="d-flex gap-3">
-                                <img src="{{ komentar.penulis.profile.avatar.url|default:'/static/images/default-avatar.png' }}" 
-                                     alt="{{ komentar.penulis.username }}" 
-                                     class="rounded-circle comment-avatar">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div>
-                                            <span class="fw-medium text-success">{{ komentar.penulis.username }}</span>
-                                            <span class="text-muted ms-2 small">{{ komentar.created_at|timesince }} yang lalu</span>
-                                        </div>
-                                        {% if komentar.penulis == request.user %}
-                                        <div class="dropdown">
-                                            <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li>
-                                                    <a class="dropdown-item" href="{% url 'forum:edit_komentar' komentar.id %}">
-                                                        <i class="fas fa-edit me-2 text-success"></i>Edit
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteKomentarModal{{ komentar.id }}">
-                                                        <i class="fas fa-trash-alt me-2"></i>Hapus
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="comment-content">
-                                        {{ komentar.isi|linebreaks }}
-                                    </div>
-                                    <button class="btn btn-link btn-sm text-muted p-0" onclick="balasKomentar('{{ komentar.penulis.username }}')">
-                                        <i class="fas fa-reply me-1"></i>Balas
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Hapus Komentar -->
-                    {% if komentar.penulis == request.user %}
-                    <div class="modal fade" id="deleteKomentarModal{{ komentar.id }}" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header border-0">
-                                    <h5 class="modal-title">Konfirmasi Hapus</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="mb-0">Apakah Anda yakin ingin menghapus komentar ini?</p>
-                                </div>
-                                <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                                    <form action="{% url 'forum:hapus_komentar' komentar.id %}" method="post" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger">Hapus</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% empty %}
-                    <div class="text-center py-5">
-                        <img src="{% static 'images/komentar.png' %}" alt="Tidak ada komentar" class="mb-3" style="width: 150px;">
+                {% empty %}
+                <div class="card border-0 shadow-sm" data-aos="fade-up">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-comment-slash fa-5x text-muted mb-4 opacity-25"></i>
                         <h5 class="mb-2">Belum Ada Komentar</h5>
                         <p class="text-muted">Jadilah yang pertama memberikan komentar!</p>
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 600,
+        once: true
+    });
+</script>
+
 <style>
 .forum-header {
-    background: linear-gradient(135deg, #198754 0%, #27ae60 100%);
-    margin-top: -76px;
-    padding-top: calc(76px + 3rem) !important;
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    position: relative;
+    overflow: hidden;
 }
 
-.discussion-avatar {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border: 2px solid #e9ecef;
+.forum-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+    background-size: cover;
 }
 
-.comment-avatar {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border: 2px solid #e9ecef;
+.header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.1);
 }
 
-.discussion-content,
-.comment-content {
-    font-size: 1rem;
-    line-height: 1.6;
+.breadcrumb {
+    background: none;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .discussion-detail,
@@ -232,36 +313,68 @@
 
 .comment-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08) !important;
+    box-shadow: 0 1rem 2rem rgba(0,0,0,0.1) !important;
+}
+
+.discussion-avatar {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comment-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.discussion-content,
+.comment-content {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #495057;
 }
 
 .form-control {
     border-radius: 0.75rem;
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
     border-color: #198754;
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
 }
 
 .dropdown-menu {
     border: none;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
     border-radius: 0.75rem;
+    padding: 0.5rem;
 }
 
 .dropdown-item {
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(25, 135, 84, 0.1);
 }
 
 .btn-light {
     background-color: #f8f9fa;
     border: none;
+    transition: all 0.3s ease;
 }
 
 .btn-light:hover {
     background-color: #e9ecef;
+    transform: translateY(-1px);
 }
 
 .modal-content {
@@ -269,8 +382,8 @@
     border-radius: 1rem;
 }
 
-.breadcrumb-item + .breadcrumb-item::before {
-    color: rgba(255, 255, 255, 0.5);
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1);
 }
 </style>
 
@@ -280,8 +393,25 @@ function balasKomentar(username) {
     if (textarea) {
         textarea.value = `@${username} `;
         textarea.focus();
-        textarea.scrollIntoView({ behavior: 'smooth' });
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+}
+
+function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>Tersalin!';
+        btn.classList.remove('btn-light');
+        btn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-light');
+        }, 2000);
+    });
 }
 </script>
 {% endblock %}

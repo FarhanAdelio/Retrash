@@ -98,29 +98,50 @@
 <section class="articles-section py-5 bg-light">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
-            <span class="text-success fw-semibold">ARTIKEL TERBARU</span>
+            <span class="badge bg-success px-3 py-2 mb-2">ARTIKEL TERBARU</span>
             <h2 class="display-5 fw-bold mt-2">Edukasi & Informasi</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Tingkatkan pengetahuan Anda tentang pengelolaan sampah dan lingkungan melalui artikel-artikel edukatif kami</p>
         </div>
-        <div class="row g-4">
+        
+        {% if artikel_terbaru %}
+        <div class="row g-4 mb-4">
             {% for artikel in artikel_terbaru %}
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
-                <div class="card h-100 border-0 shadow-sm hover-lift">
-                    <div class="position-relative">
-                        <img src="{{ artikel.gambar.url }}" class="card-img-top" alt="{{ artikel.judul }}" style="height: 200px; object-fit: cover;">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'50'|stringformat:'d' }}">
+                <div class="card h-100 border-0 shadow-sm hover-lift article-card">
+                    <div class="position-relative overflow-hidden">
+                        {% if artikel.gambar %}
+                        <img src="{{ artikel.gambar.url }}" class="card-img-top article-img" alt="{{ artikel.judul }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top article-img d-flex align-items-center justify-content-center bg-success-subtle" style="height: 220px;">
+                            <i class="fas fa-newspaper fa-4x text-success opacity-25"></i>
+                        </div>
+                        {% endif %}
                         <div class="position-absolute top-0 end-0 m-3">
-                            <span class="badge bg-success rounded-pill">
-                                <i class="fas fa-bookmark me-1"></i>{{ artikel.kategori }}
+                            <span class="badge bg-success rounded-pill shadow-sm">
+                                <i class="fas fa-folder me-1"></i>{{ artikel.kategori.nama }}
                             </span>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="far fa-calendar-alt text-success me-2"></i>
-                            <small class="text-muted">{{ artikel.tanggal_publikasi|date:"d M Y" }}</small>
+                        <div class="article-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-dark bg-opacity-75">
+                                    <i class="far fa-calendar me-1"></i>{{ artikel.tanggal_publikasi|date:"d M Y" }}
+                                </span>
+                                <span class="badge bg-dark bg-opacity-75">
+                                    <i class="far fa-eye me-1"></i>{{ artikel.dilihat }} views
+                                </span>
+                            </div>
                         </div>
-                        <h5 class="card-title">{{ artikel.judul }}</h5>
-                        <p class="card-text text-muted">{{ artikel.konten|truncatewords:20 }}</p>
-                        <a href="/edukasi/{{ artikel.slug }}/" class="btn btn-outline-success">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-user-circle me-1"></i>
+                                oleh <strong>{{ artikel.penulis.username }}</strong>
+                            </small>
+                        </div>
+                        <h5 class="card-title mb-3 fw-bold">{{ artikel.judul|truncatewords:10 }}</h5>
+                        <p class="card-text text-muted mb-4 flex-grow-1">{{ artikel.konten|striptags|truncatewords:15 }}</p>
+                        <a href="{% url 'edukasi:detail' artikel.slug %}" class="btn btn-outline-success w-100">
                             <i class="fas fa-arrow-right me-2"></i>Baca Selengkapnya
                         </a>
                     </div>
@@ -128,11 +149,19 @@
             </div>
             {% endfor %}
         </div>
+        
+        <div class="text-center" data-aos="fade-up">
+            <a href="{% url 'edukasi:list' %}" class="btn btn-success btn-lg px-5">
+                <i class="fas fa-book-open me-2"></i>Lihat Semua Artikel
+                <span class="badge bg-white text-success ms-2">{{ total_artikel }}</span>
+            </a>
+        </div>
+        {% endif %}
     </div>
 </section>
 
 <!-- Bank Sampah Map Section -->
-<section class="map-section py-5 bg-light">
+<section class="map-section py-5">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <span class="badge bg-success px-3 py-2 mb-2">LOKASI</span>
@@ -140,64 +169,88 @@
             <p class="text-muted mx-auto" style="max-width: 600px;">Temukan lokasi bank sampah terdekat dari posisi Anda dan dapatkan informasi detail tentang setiap lokasi</p>
         </div>
         
-        <div class="row g-4 justify-content-center">
-            <!-- Map Column -->
-            <div class="col-lg-7" data-aos="fade-right">
-                <div class="map-container rounded-4 shadow-sm overflow-hidden h-100">
-                    <div id="map" style="height: 600px; width: 100%;"></div>
-                </div>
-            </div>
-            
-            {% comment %} <!-- Bank List Column -->
-            <div class="col-lg-5" data-aos="fade-left">
-                <div class="bank-list-container h-100 bg-white rounded-4 shadow-sm p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0">Daftar Bank Sampah</h5>
-                        <span class="badge bg-success rounded-pill">
-                            <i class="fas fa-location-dot me-1"></i>Terdekat
-                        </span>
+        {% if bank_terdekat %}
+        <div class="row g-4 mb-4">
+            {% for bank in bank_terdekat %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'50'|stringformat:'d' }}">
+                <div class="card h-100 border-0 shadow-sm hover-lift bank-card">
+                    <div class="position-relative overflow-hidden">
+                        {% if bank.gambar %}
+                        <img src="{{ bank.gambar.url }}" class="card-img-top bank-img" alt="{{ bank.nama }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bank-img d-flex align-items-center justify-content-center bg-success-subtle" style="height: 200px;">
+                            <i class="fas fa-recycle fa-4x text-success opacity-25"></i>
+                        </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-success shadow-sm">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ bank.kota|default:"Jakarta" }}
+                            </span>
+                        </div>
                     </div>
-                    
-                    <div class="bank-list" style="height: 520px; overflow-y: auto;">
-                        {% for bank in bank_terdekat %}
-                        <div class="card mb-3 border-0 shadow-hover">
-                            <div class="row g-0">
-                                <div class="col-4">
-                                    <img src="{{ bank.gambar.url }}" 
-                                         class="img-fluid rounded-start h-100" 
-                                         style="object-fit: cover;" 
-                                         alt="{{ bank.nama }}">
-                                </div>
-                                <div class="col-8">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <h6 class="card-title mb-1">{{ bank.nama }}</h6>
-                                            <span class="badge bg-success-subtle text-success rounded-pill">
-                                                <i class="fas fa-map-marker-alt me-1"></i>{{ bank.jarak }} km
-                                            </span>
-                                        </div>
-                                        <p class="card-text small text-muted mb-2">
-                                            <i class="fas fa-location-dot me-1"></i>{{ bank.alamat }}
-                                        </p>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <a href="/bank-sampah/{{ bank.id }}/" 
-                                               class="btn btn-sm btn-success flex-grow-1">
-                                                <i class="fas fa-info-circle me-1"></i>Detail
-                                            </a>
-                                            <button onclick="showRoute({{ bank.latitude }}, {{ bank.longitude }})" 
-                                                    class="btn btn-sm btn-outline-success flex-grow-1">
-                                                <i class="fas fa-directions me-1"></i>Rute
-                                            </button>
-                                        </div>
-                                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-3 fw-bold">{{ bank.nama }}</h5>
+                        
+                        <div class="bank-info mb-3 flex-grow-1">
+                            <div class="d-flex align-items-start mb-2">
+                                <i class="fas fa-location-dot text-success me-2 mt-1"></i>
+                                <small class="text-muted">{{ bank.alamat|truncatewords:8 }}</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-phone text-success me-2"></i>
+                                <small class="text-muted">{{ bank.telepon }}</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-clock text-success me-2"></i>
+                                <small class="text-muted">{{ bank.jam_operasional }}</small>
+                            </div>
+                            
+                            <div class="waste-types">
+                                <small class="text-muted d-block mb-2">
+                                    <i class="fas fa-recycle me-1"></i>Jenis Sampah:
+                                </small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for jenis in bank.jenis_sampah.all|slice:":4" %}
+                                    <span class="badge bg-success-subtle text-success">{{ jenis.nama }}</span>
+                                    {% endfor %}
+                                    {% if bank.jenis_sampah.count > 4 %}
+                                    <span class="badge bg-success-subtle text-success">+{{ bank.jenis_sampah.count|add:"-4" }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'bank_sampah:detail' bank.id %}" class="btn btn-success">
+                                <i class="fas fa-info-circle me-2"></i>Lihat Detail
+                            </a>
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ bank.latitude }},{{ bank.longitude }}" 
+                               target="_blank" 
+                               class="btn btn-outline-success">
+                                <i class="fas fa-directions me-2"></i>Petunjuk Arah
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div> {% endcomment %}
+            </div>
+            {% endfor %}
         </div>
+        
+        <div class="text-center" data-aos="fade-up">
+            <a href="{% url 'bank_sampah:list' %}" class="btn btn-success btn-lg px-5">
+                <i class="fas fa-map-location-dot me-2"></i>Lihat Semua Lokasi
+                <span class="badge bg-white text-success ms-2">{{ total_bank }}</span>
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-5" data-aos="fade-up">
+            <i class="fas fa-map-marker-alt fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Belum ada bank sampah terdaftar</h4>
+            <p class="text-muted">Data bank sampah akan segera tersedia!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
     </div>
 </section>
 
@@ -306,6 +359,67 @@
 
 .feature-card:hover .icon-circle {
     transform: scale(1.1);
+}
+
+/* Articles Section Styles */
+.articles-section {
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.article-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.article-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important;
+}
+
+.article-img {
+    transition: transform 0.5s ease;
+}
+
+.article-card:hover .article-img {
+    transform: scale(1.1);
+}
+
+.article-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+/* Bank Section Styles */
+.map-section {
+    background: #ffffff;
+}
+
+.bank-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.bank-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important;
+}
+
+.bank-img {
+    transition: transform 0.5s ease;
+}
+
+.bank-card:hover .bank-img {
+    transform: scale(1.1);
+}
+
+.bank-info {
+    font-size: 0.9rem;
+}
+
+.waste-types .badge {
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 /* Map Section Styles */
