@@ -227,7 +227,6 @@ class TrackingHistory(models.Model):
 
 
 class PenjemputanSchedule(models.Model):
-    """Model untuk jadwal penjemputan"""
     
     HARI_CHOICES = [
         ('senin', 'Senin'),
